@@ -4,12 +4,7 @@ import os
 import sys
 import threading
 
-from PyQt6.QtWidgets import (
-    QApplication, 
-    QMainWindow,
-    QLabel,
-    QWidget
-)
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QLabel, QWidget)
 
 import constants
 import views
