@@ -11,7 +11,6 @@ from PyQt6.QtWidgets import (
     QWidget
 )
 
-import constants
 import views
 import models
 
