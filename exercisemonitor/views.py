@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QLayout,
     QPushButton,
     QVBoxLayout,
-    QHBoxLayout
+    QHBoxLayout,
 )
 from PyQt6.QtGui import QPicture, QPixmap
 import cv2
