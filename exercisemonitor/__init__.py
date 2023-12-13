@@ -24,7 +24,7 @@ class Frame:
     def __getitem__(self, key):
         return self._frame[key]
 
-class FormMonitor(QMainWindow):
+class ExerciseMonitor(QMainWindow):
     def __init__(self, size):
         super().__init__()
         self.setFixedSize(size)
@@ -84,6 +84,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     screen = app.primaryScreen()
     print(screen.size())
-    window = FormMonitor(screen.size())
+    window = ExerciseMonitor(screen.size())
     window.showFullScreen() # Enable full screen
     sys.exit(app.exec())
