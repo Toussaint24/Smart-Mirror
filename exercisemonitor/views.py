@@ -53,7 +53,7 @@ class RecorderView(View):
         
         self.label = QLabel(self.centralWidget)
         self.label.resize(parent.height(), parent.height())
-        self.label.move(self.centralWidget.rect().center().x()-self.label.width()//2, 0)
+        self.label.move(self.rect().center().x()-(self.label.width()//2), 0)
         
         self.setStyleSheet("background-color: black; border:2px solid red;")
     
