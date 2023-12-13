@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
     QWidget
 )
 
+import constants
 import views
 import models
 
@@ -23,7 +24,7 @@ class Frame:
     def __getitem__(self, key):
         return self._frame[key]
 
-class ExerciseMonitor(QMainWindow):
+class FitnessMonitor(QMainWindow):
     def __init__(self, size):
         super().__init__()
         self.setFixedSize(size)
@@ -83,6 +84,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     screen = app.primaryScreen()
     print(screen.size())
-    window = ExerciseMonitor(screen.size())
+    window = FitnessMonitor(screen.size())
     window.showFullScreen() # Enable full screen
     sys.exit(app.exec())
