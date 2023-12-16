@@ -1,84 +1,75 @@
-from functools import partial
-from typing import Callable
-import os
 import sys
 import threading
 
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QLabel, QWidget)
+from tkinter.ttk import Button, Label
+from tkinter import Tk, StringVar, Image
 
-import constants
+from pose_estimator import Recorder
 import views
-import models
 
-class Frame:
-    def __init__(self, view: views.View, model: Callable[[], None] = None):
-        self._view = view
-        self._model = model
-        self._frame = {"model":self._model, "view":self._view}
-        
-    def __getitem__(self, key):
-        return self._frame[key]
 
-class FitnessMonitor(QMainWindow):
-    def __init__(self, size):
-        super().__init__()
-        self.setFixedSize(size)
-        self._currentExercise = None
-        self._initFrames()
-        self.recordingThread = threading.Thread(target=self._recorderFrame["model"].func, daemon=True)
+class App:
+    
+    def __init__(self):
+        self._initViews()
+        self._recorder = Recorder()
+        self._recording_thread = threading.Thread(
+            target=lambda: self._recorder.start(self._recorder_view.display, True), daemon=True
+            )
         
-    def _initFrames(self):
-        self._mainFrame = Frame(view=views.MainView(self))
+    def _initViews(self):
+        self._main_view = views.MainView(root, self)
+        self._settings_view = views.SettingsView(root, self)
+        self._exercises_view = views.ExerciseListView(root, self)
+        self._recorder_view = views.RecorderView(root, self)
         
-        view = views.ExerciseListView(self)
-        self._exerListFrame = Frame(view, self._switchFrames)
+        self._main_view.pack(expand=1, fill="both")
+        self._current_view = self._main_view
         
-        view = views.RecorderView(self)
-        self._recorderFrame = Frame(view, models.RecorderModel(view))
+    def _setView(self, view):
+        self._current_view.forget()
+        self._current_view = view
+        self._current_view.pack(expand=1, fill="both")
         
-        self._connectSignalsAndSlots()
-        self._currentFrame = self._mainFrame
-        self._exerListFrame["view"].hide()
-        self._recorderFrame["view"].hide()
-        self.setCentralWidget(self._mainFrame["view"])
+    def update(self, request):
+        if self._current_view == self._main_view:
+            
+            if request == "exer_list":
+                self._setView(self._exercises_view)
+            elif request == "settings":
+                self._setView(self._settings_view)
+            elif request == "quit":
+                self._quit()
+            
+        elif self._current_view == self._settings_view:
+            
+            pass
         
-    def _switchFrames(self, frame):
-        self._currentFrame["view"].hide()
-        self._currentFrame = frame
-        self.setCentralWidget(frame["view"])
-        frame["view"].show()
-        
-    def _connectSignalsAndSlots(self):
-        frame = self._mainFrame
-        frame["view"].button.clicked.connect(partial(self._switchFrames, self._exerListFrame))
-        
-        frame = self._exerListFrame
-        frame["view"].button.clicked.connect(partial(self._startExercise, self._recorderFrame))
-        
-        frame = self._recorderFrame
-        frame["view"].button.clicked.connect(self._record)
-        
-    def _startExercise(self, frame):
-        self._switchFrames(frame)
-        self._record()
+        elif self._current_view == self._exercises_view:
+            
+            if request == "Lorem":
+                self._record()
+                self._setView(self._recorder_view)
+            elif request == "back":
+                self._stop_recording()
+                self._setView(self._main_view)
         
     def _record(self):
-        # Check for if thread is already running
-        self.recordingThread.start()
-
-    def _calibrate(self):
-        pass
-    
-    def close(self):
-        self._recorderFrame["model"].running = False
-        self.recordingThread.join()
-        super().close()
+        if not self._recording_thread.is_alive():
+            self._recording_thread.start()
         
+    def _stop_recording(self):
+        self._recorder.running = False
+        self._recording_thread.join()
+
+    def _quit(self):
+        if self._recording_thread.is_alive():
+            self._stop_recording()
+        sys.exit()
+                
     
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    screen = app.primaryScreen()
-    print(screen.size())
-    window = FitnessMonitor(screen.size())
-    window.showFullScreen() # Enable full screen
-    sys.exit(app.exec())
+    root = Tk()
+    root.attributes("-fullscreen", True)
+    app = App()
+    root.mainloop()
