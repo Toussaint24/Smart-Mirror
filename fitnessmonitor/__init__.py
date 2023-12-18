@@ -1,8 +1,7 @@
 import sys
 import threading
 
-from tkinter.ttk import Button, Label
-from tkinter import Tk, StringVar, Image
+from tkinter import Tk
 
 from pose_estimator import Recorder
 import views
@@ -14,7 +13,8 @@ class App:
         self._initViews()
         self._recorder = Recorder()
         self._recording_thread = threading.Thread(
-            target=lambda: self._recorder.start(self._recorder_view.display, True), daemon=True
+            target=lambda: self._recorder.start((root.winfo_width(), root.winfo_height()), self._recorder_view.display, True), 
+            daemon=True
             )
         
     def _initViews(self):

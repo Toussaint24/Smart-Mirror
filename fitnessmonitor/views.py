@@ -55,7 +55,7 @@ class ExerciseListView(View):
         
         
 class PreviewView(View):
-    pass       
+    pass
         
         
 class RecorderView(View):
@@ -65,6 +65,5 @@ class RecorderView(View):
         self._initWidgets()
         
     def _initWidgets(self):
-        self.display = ttk.Label(self, width=self._parent.winfo_height(), 
-                                 anchor="center", background="black")
-        self.display.grid(row=0, column=1, sticky=tk.NS)
+        self.display = ttk.Label(self, background="black")
+        self.display.pack(expand=1, fill="both")
