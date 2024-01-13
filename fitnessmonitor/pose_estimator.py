@@ -2,7 +2,6 @@ import mediapipe as mp
 from PIL import Image, ImageTk
 import cv2
 from matplotlib import pyplot as plt
-import numpy as np
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose

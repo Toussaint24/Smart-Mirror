@@ -66,7 +66,7 @@ class App:
         if self._recording_thread.is_alive():
             self._stop_recording()
         sys.exit()
-                
+              
     
 if __name__ == "__main__":
     root = Tk()
