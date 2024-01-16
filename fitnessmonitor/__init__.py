@@ -3,7 +3,7 @@ import threading
 
 from tkinter import Tk
 
-from pose_estimator import Recorder
+from pose_landmarker import Recorder
 import views
 
 
@@ -11,11 +11,7 @@ class App:
     
     def __init__(self):
         self._initViews()
-        self._recorder = Recorder()
-        self._recording_thread = threading.Thread(
-            target=lambda: self._recorder.start((root.winfo_width(), root.winfo_height()), self._recorder_view.display, True), 
-            daemon=True
-            )
+        self._recorder = Recorder(dst=self._recorder_view.display)
         
     def _initViews(self):
         self._main_view = views.MainView(root, self)
@@ -55,12 +51,11 @@ class App:
                 self._setView(self._main_view)
         
     def _record(self):
-        if not self._recording_thread.is_alive():
-            self._recording_thread.start()
+        if not self._recorder.is_alive():
+            self._recorder.start()
         
     def _stop_recording(self):
-        self._recorder.running = False
-        self._recording_thread.join()
+        self._recorder.close()
 
     def _quit(self):
         if self._recording_thread.is_alive():
