@@ -1,23 +1,23 @@
 import sys
-import threading
 
 from tkinter import Tk
 
-from pose_landmarker import Recorder
-import views
+from recorder.pose_landmarker import PoseRecorder
+import fitnessmonitor.views as views
 
 
 class App:
     
-    def __init__(self):
+    def __init__(self, root):
+        self.root = root
         self._initViews()
-        self._recorder = Recorder(dst=self._recorder_view.display)
+        self._recorder = PoseRecorder(dst=self._recorder_view.display)
         
     def _initViews(self):
-        self._main_view = views.MainView(root, self)
-        self._settings_view = views.SettingsView(root, self)
-        self._exercises_view = views.ExerciseListView(root, self)
-        self._recorder_view = views.RecorderView(root, self)
+        self._main_view = views.MainView(self.root, self)
+        self._settings_view = views.SettingsView(self.root, self)
+        self._exercises_view = views.ExerciseListView(self.root, self)
+        self._recorder_view = views.RecorderView(self.root, self)
         
         self._main_view.pack(expand=1, fill="both")
         self._current_view = self._main_view
@@ -58,13 +58,6 @@ class App:
         self._recorder.close()
 
     def _quit(self):
-        if self._recording_thread.is_alive():
+        if self._recorder.is_alive():
             self._stop_recording()
         sys.exit()
-              
-    
-if __name__ == "__main__":
-    root = Tk()
-    root.attributes("-fullscreen", True)
-    app = App()
-    root.mainloop()

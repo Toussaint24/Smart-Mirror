@@ -1,66 +1,43 @@
-import threading
+import math
+import os
 import time
 
 import cv2
 import mediapipe as mp
 from mediapipe.framework.formats import landmark_pb2
-import numpy as np
-import math
 from PIL import Image, ImageTk
 
-DEBUG = True
-
-model_path = "fitnessmonitor/pose_landmarker_lite.task"
+from recorder.util.recorder import Recorder
 
 mp_drawing = mp.solutions.drawing_utils 
 mp_drawing_styles = mp.solutions.drawing_styles 
 mp_pose = mp.solutions.pose
 
 BaseOptions = mp.tasks.BaseOptions
+VisionRunningMode = mp.tasks.vision.RunningMode
 PoseLandmarker = mp.tasks.vision.PoseLandmarker
 PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
 PoseLandmarkerResult = mp.tasks.vision.PoseLandmarkerResult
-HandLandmarker = mp.tasks.vision.HandLandmarker
-HandLandmarkerOptions = mp.tasks.vision.HandLandmarkerOptions
-HandLandmarkerResult = mp.tasks.vision.HandLandmarkerResult
-VisionRunningMode = mp.tasks.vision.RunningMode
-
-previous_time = time.time()
-frames = 0
 
 # TODO: Add model_path parameter
 # TODO: Remove live video output
 # TODO: Save video to drive
-class Recorder(threading.Thread):
+class PoseRecorder(Recorder):
     def __init__(self, dst=None):
         self._dst = dst
-        self._cap = cv2.VideoCapture(0)
-        self._current_frame = None
-        self._current_result = None
-        self._running = True
-        self._detector = self._init_detector()
-        super().__init__()
+        super().__init__(os.path.join("recorder", "models", "pose_landmarker_lite.task"))
         
     def _init_detector(self) -> PoseLandmarker:
         """Create and return pose landmarker"""
         return PoseLandmarker.create_from_options(PoseLandmarkerOptions(
-            base_options=BaseOptions(model_asset_path=model_path),
+            base_options=BaseOptions(model_asset_path=self.model),
             running_mode=VisionRunningMode.LIVE_STREAM,
             result_callback=self._data_handler)
         )
         
-    def _get_framerate(self) -> None:
-        """Calculate current framerate"""
-        global previous_time
-        current_time = time.time()
-        fps = 1/(current_time-previous_time)
-        previous_time = current_time  
-        
     def _data_handler(self, result: PoseLandmarkerResult, image: mp.Image, timestamp: int) -> None:
-        """Callback function for detector"""
-        self._current_result = result
-        if DEBUG:
-            self._get_framerate()
+        """Wrapper function for parent handler"""
+        super()._data_handler(result, image, timestamp)
             
     def _draw_landmarks(self) -> None:
         """Draws pose landmarks and connections"""
@@ -118,7 +95,7 @@ class Recorder(threading.Thread):
     def run(self) -> None:
         """Get camera feed and run pose landmarker"""
         # Get camera feed
-        ret, frame = self._cap.read()
+        _, frame = self._cap.read()
         
         # Image preprocessing
         frame = cv2.flip(frame, 1)
@@ -142,8 +119,3 @@ class Recorder(threading.Thread):
         self._dst.configure(image=image_tk)
         
         self._dst.after(1, self.run)
-            
-    def close(self):
-        self._running = False
-        self._cap.release()
-        self._detector.close()
