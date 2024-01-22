@@ -1,8 +1,6 @@
-import threading
-
 import cv2
 
-class Recorder(threading.Thread):
+class Recorder:
     def __init__(self, model, output_size):
         self.model = model
         self.output_size = output_size
@@ -11,7 +9,6 @@ class Recorder(threading.Thread):
         self._current_frame = None
         self._current_result = None
         self._running = True
-        super().__init__()
         
     def _init_detector(self):
         """Create and return vision detector model"""

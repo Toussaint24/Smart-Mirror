@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from fitnessmonitor.controller import App
+from fitnessmonitor.app import App
 
 root = tk.Tk()
 root.attributes("-fullscreen", True)

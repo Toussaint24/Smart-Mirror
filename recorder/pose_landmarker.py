@@ -5,8 +5,8 @@ import time
 import cv2
 import mediapipe as mp
 from mediapipe.framework.formats import landmark_pb2
-import numpy as np
 from PIL import Image, ImageTk
+import tkinter
 
 from recorder.util.recorder import Recorder
 
@@ -20,11 +20,13 @@ PoseLandmarker = mp.tasks.vision.PoseLandmarker
 PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
 PoseLandmarkerResult = mp.tasks.vision.PoseLandmarkerResult
 
+previous_time = time.time()
+
 # TODO: Add model_path parameter
 # TODO: Remove live video output
 # TODO: Save video to drive
 class PoseRecorder(Recorder):
-    def __init__(self, dst=None, output_size=(256, 256)):
+    def __init__(self, dst: tkinter.Canvas = None, output_size=(256, 256)):
         self._dst = dst
         super().__init__(os.path.join("recorder", "models", "pose_landmarker_lite.task"), output_size)
         
@@ -38,7 +40,12 @@ class PoseRecorder(Recorder):
         
     def _data_handler(self, result: PoseLandmarkerResult, image: mp.Image, timestamp: int) -> None:
         """Wrapper function for parent handler"""
+        global previous_time
         super()._data_handler(result, image, timestamp)
+        current_time = time.time()
+        fps = 1/(current_time-previous_time)
+        previous_time = current_time
+        print(fps)
             
     def _draw_landmarks(self) -> None:
         """Draws pose landmarks and connections"""
@@ -113,13 +120,16 @@ class PoseRecorder(Recorder):
             self._draw_landmarks() 
             self.get_arm_angle()
         
-        self._current_frame = cv2.resize(self._current_frame, (self.output_size[0], self.output_size[1]), 
+        """self._current_frame = cv2.resize(self._current_frame, (self.output_size[0], self.output_size[1]), 
                interpolation = cv2.INTER_LINEAR)
         
-        blue, green, red = cv2.split(self._current_frame)
-        image_tk = Image.fromarray(cv2.merge((red, green, blue)))
-        image_tk = ImageTk.PhotoImage(image=image_tk)
-        self._dst.image = image_tk
-        self._dst.configure(image=image_tk)
+        self._current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
-        self._dst.after(1, self.run)
+        image_tk = ImageTk.PhotoImage(image = Image.fromarray(self._current_frame))
+        self.image = image_tk
+        self._dst.create_image(0, 0, image = image_tk, anchor = tkinter.NW)"""
+        
+        cv2.imshow("Window", self._current_frame)
+        
+        if self._running:
+            self._dst.after(1, self.run)
