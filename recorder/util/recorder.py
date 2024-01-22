@@ -3,8 +3,9 @@ import threading
 import cv2
 
 class Recorder(threading.Thread):
-    def __init__(self, model):
+    def __init__(self, model, output_size):
         self.model = model
+        self.output_size = output_size
         self._cap = cv2.VideoCapture(0)
         self._detector = self._init_detector()
         self._current_frame = None

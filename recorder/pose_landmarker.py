@@ -5,6 +5,7 @@ import time
 import cv2
 import mediapipe as mp
 from mediapipe.framework.formats import landmark_pb2
+import numpy as np
 from PIL import Image, ImageTk
 
 from recorder.util.recorder import Recorder
@@ -23,9 +24,9 @@ PoseLandmarkerResult = mp.tasks.vision.PoseLandmarkerResult
 # TODO: Remove live video output
 # TODO: Save video to drive
 class PoseRecorder(Recorder):
-    def __init__(self, dst=None):
+    def __init__(self, dst=None, output_size=(256, 256)):
         self._dst = dst
-        super().__init__(os.path.join("recorder", "models", "pose_landmarker_lite.task"))
+        super().__init__(os.path.join("recorder", "models", "pose_landmarker_lite.task"), output_size)
         
     def _init_detector(self) -> PoseLandmarker:
         """Create and return pose landmarker"""
@@ -111,6 +112,9 @@ class PoseRecorder(Recorder):
         if self._current_result != None:
             self._draw_landmarks() 
             self.get_arm_angle()
+        
+        self._current_frame = cv2.resize(self._current_frame, (self.output_size[0], self.output_size[1]), 
+               interpolation = cv2.INTER_LINEAR)
         
         blue, green, red = cv2.split(self._current_frame)
         image_tk = Image.fromarray(cv2.merge((red, green, blue)))

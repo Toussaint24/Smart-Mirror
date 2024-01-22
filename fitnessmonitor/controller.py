@@ -1,6 +1,6 @@
 import sys
 
-from tkinter import Tk
+from tkinter import Tk, Frame
 
 from recorder.pose_landmarker import PoseRecorder
 import fitnessmonitor.views as views
@@ -8,10 +8,12 @@ import fitnessmonitor.views as views
 
 class App:
     
-    def __init__(self, root):
+    def __init__(self, root: Tk):
         self.root = root
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_rowconfigure(0, weight=1) 
         self._initViews()
-        self._recorder = PoseRecorder(dst=self._recorder_view.display)
+        self._recorder = PoseRecorder(dst=self._recorder_view.display, output_size=(self.root.winfo_screenwidth(), self.root.winfo_screenheight()))
         
     def _initViews(self):
         self._main_view = views.MainView(self.root, self)
@@ -19,13 +21,12 @@ class App:
         self._exercises_view = views.ExerciseListView(self.root, self)
         self._recorder_view = views.RecorderView(self.root, self)
         
-        self._main_view.pack(expand=1, fill="both")
         self._current_view = self._main_view
+        self._current_view.tkraise()
         
     def _setView(self, view):
-        self._current_view.forget()
+        view.tkraise()
         self._current_view = view
-        self._current_view.pack(expand=1, fill="both")
         
     def update(self, request):
         if self._current_view == self._main_view:
@@ -44,8 +45,9 @@ class App:
         elif self._current_view == self._exercises_view:
             
             if request == "Lorem":
-                self._record()
+                print("Here")
                 self._setView(self._recorder_view)
+                self._record()
             elif request == "back":
                 self._stop_recording()
                 self._setView(self._main_view)

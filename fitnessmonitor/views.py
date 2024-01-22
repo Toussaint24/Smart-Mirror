@@ -11,6 +11,7 @@ class View(ttk.Frame):
             self.rowconfigure(row, weight=1)
         for col in range(size[1]):
             self.columnconfigure(col, weight=1)
+        self.grid(row=0, column=0, sticky="nsew")
     
     def _initWidgets(self, title):
         ttk.Label(self, text=title, font=("Helvetica", 32), anchor="center").grid(row=0, column=0, sticky=tk.NSEW)
@@ -66,4 +67,4 @@ class RecorderView(View):
         
     def _initWidgets(self):
         self.display = ttk.Label(self, background="black")
-        self.display.pack(expand=1, fill="both")
+        self.display.grid(row=0, column=0, sticky="nsew")
