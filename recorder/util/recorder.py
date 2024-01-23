@@ -4,7 +4,6 @@ class Recorder:
     def __init__(self, model, output_size):
         self.model = model
         self.output_size = output_size
-        self._cap = cv2.VideoCapture(0)
         self._detector = self._init_detector()
         self._current_frame = None
         self._current_result = None
@@ -17,6 +16,9 @@ class Recorder:
     def _data_handler(self, result, image, timestamp):
         """Callback function for detector"""
         self._current_result = result
+        
+    def start_camera(self):
+        self._cap = cv2.VideoCapture(0)
         
     def run(self):
         raise NotImplementedError("method 'run' was not overwritten in subclass")

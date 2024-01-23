@@ -21,8 +21,7 @@ PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
 PoseLandmarkerResult = mp.tasks.vision.PoseLandmarkerResult
 
 previous_time = time.time()
-
-# TODO: Add model_path parameter
+# TODO: Add sanity checker for detections
 # TODO: Remove live video output
 # TODO: Save video to drive
 class PoseRecorder(Recorder):
@@ -34,6 +33,9 @@ class PoseRecorder(Recorder):
         """Create and return pose landmarker"""
         return PoseLandmarker.create_from_options(PoseLandmarkerOptions(
             base_options=BaseOptions(model_asset_path=self.model),
+            min_pose_detection_confidence=0.6,
+            min_pose_presence_confidence=0.6,
+            min_tracking_confidence=0.6,
             running_mode=VisionRunningMode.LIVE_STREAM,
             result_callback=self._data_handler)
         )
@@ -45,7 +47,7 @@ class PoseRecorder(Recorder):
         current_time = time.time()
         fps = 1/(current_time-previous_time)
         previous_time = current_time
-        print(fps)
+        #print(fps)
             
     def _draw_landmarks(self) -> None:
         """Draws pose landmarks and connections"""
@@ -60,39 +62,31 @@ class PoseRecorder(Recorder):
                 mp_pose.POSE_CONNECTIONS,
                 mp_drawing_styles.get_default_pose_landmarks_style())
             
-    def get_arm_angle(self) -> int:
+    def get_angle(self, landmarks, keypoints) -> int:
         """
-        Calculate and return angle of inner elbow
+        Calculate and return middle angle of keypoints
 
         Returns:
             angle (int): angle of inner elbow in degrees. -1 if no angle found. [0, 180] otherwise.
         """
-        
-        # Check if results available
-        try:
-            landmarks = self._current_result.pose_landmarks[0]
-        except:
-            return -1
-        
         # Determine visible joints
-        pose_landmarks = mp_pose.PoseLandmark
-        joints = [pose_landmarks.LEFT_SHOULDER, pose_landmarks.LEFT_ELBOW, pose_landmarks.LEFT_WRIST]
+        joints = [keypoints[0], keypoints[1], keypoints[2]]
         visible = [landmarks[joint].visibility > 0.5 for joint in joints]
         
         if all(visible):
             # Get joint coordinates
-            a = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER].x, landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER].y]
-            b = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW].x, landmarks[mp_pose.PoseLandmark.LEFT_ELBOW].y]
-            c = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST].x, landmarks[mp_pose.PoseLandmark.LEFT_WRIST].y]
+            a = [landmarks[keypoints[0]].x, landmarks[keypoints[0]].y]
+            b = [landmarks[keypoints[1]].x, landmarks[keypoints[1]].y]
+            c = [landmarks[keypoints[2]].x, landmarks[keypoints[2]].y]
             
             # Get distances of joints
-            shoulder_to_elbow = math.dist(a, b)
-            elbow_to_wrist = math.dist(b, c)
-            wrist_to_shoulder = math.dist(c, a)
+            a_to_b = math.dist(a, b)
+            b_to_c = math.dist(b, c)
+            c_to_a = math.dist(c, a)
             
             # Use law of cosines to get angle and convert to degrees
             radians = math.acos(
-                (wrist_to_shoulder**2 - (shoulder_to_elbow**2 + elbow_to_wrist**2))/(-2*shoulder_to_elbow*elbow_to_wrist)
+                (c_to_a**2 - (a_to_b**2 + b_to_c**2))/(-2*a_to_b*b_to_c)
                 )
             angle = abs(radians*180/math.pi)
         else:
@@ -118,18 +112,13 @@ class PoseRecorder(Recorder):
         # Visualization
         if self._current_result != None:
             self._draw_landmarks() 
-            self.get_arm_angle()
         
         """self._current_frame = cv2.resize(self._current_frame, (self.output_size[0], self.output_size[1]), 
-               interpolation = cv2.INTER_LINEAR)
-        
-        self._current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
-        image_tk = ImageTk.PhotoImage(image = Image.fromarray(self._current_frame))
-        self.image = image_tk
-        self._dst.create_image(0, 0, image = image_tk, anchor = tkinter.NW)"""
+               interpolation = cv2.INTER_LINEAR)"""
         
         cv2.imshow("Window", self._current_frame)
         
-        if self._running:
-            self._dst.after(1, self.run)
+        if self._current_result != None and self._current_result.pose_landmarks:
+            return self._current_result.pose_landmarks[0]
+        else:
+            return None
