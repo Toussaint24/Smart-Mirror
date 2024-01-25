@@ -55,5 +55,10 @@ class Recorder:
     
     def close(self):
         self._running = False
-        self._cap.release()
+        
+        try:
+            self._cap.release()
+        except AttributeError:
+            pass
+        
         self._detector.close()

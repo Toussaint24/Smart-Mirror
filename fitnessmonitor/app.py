@@ -20,6 +20,9 @@ class App:
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_rowconfigure(0, weight=1) 
         self._init_views()
+        self._recorder = PoseRecorder(
+                output_size=(self.root.winfo_screenwidth(), self.root.winfo_screenheight())
+        )
         self.position = 1
         self.counter = 0
         
@@ -59,11 +62,6 @@ class App:
     def record(self):
         self.current_exercise = curl.name
         self.set_view("recorder")
-        self._recorder = PoseRecorder(
-                dst=self._recorder_view.display, 
-                output_size=(self.root.winfo_screenwidth(), 
-                             self.root.winfo_screenheight())
-        )
         self._recorder.start_camera()
         self.run_exercise()
         
@@ -72,6 +70,6 @@ class App:
         self.set_view("main")
 
     def quit(self):
-        if self._recorder._running():
+        if self._recorder._running:
             self.stop_recording()
         sys.exit()
