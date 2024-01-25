@@ -2,11 +2,8 @@ import math
 import os
 import time
 
-import cv2
 import mediapipe as mp
 from mediapipe.framework.formats import landmark_pb2
-from PIL import Image, ImageTk
-import tkinter
 
 from recorder.util.recorder import Recorder
 
@@ -20,13 +17,10 @@ PoseLandmarker = mp.tasks.vision.PoseLandmarker
 PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
 PoseLandmarkerResult = mp.tasks.vision.PoseLandmarkerResult
 
-previous_time = time.time()
-# TODO: Add sanity checker for detections
 # TODO: Remove live video output
 # TODO: Save video to drive
 class PoseRecorder(Recorder):
-    def __init__(self, dst: tkinter.Canvas = None, output_size=(256, 256)):
-        self._dst = dst
+    def __init__(self, output_size: tuple[int, int] = (256, 256)):
         super().__init__(os.path.join("recorder", "models", "pose_landmarker_lite.task"), output_size)
         
     def _init_detector(self) -> PoseLandmarker:
@@ -96,29 +90,9 @@ class PoseRecorder(Recorder):
             
     def run(self) -> None:
         """Get camera feed and run pose landmarker"""
-        # Get camera feed
-        _, frame = self._cap.read()
+        super().run()
         
-        # Image preprocessing
-        frame = cv2.flip(frame, 1)
-        rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
-        
-        # Detections
-        timestamp = round(time.time()*1000)
-        self._detector.detect_async(mp_image, timestamp)
-        self._current_frame = frame           
-        
-        # Visualization
-        if self._current_result != None:
-            self._draw_landmarks() 
-        
-        """self._current_frame = cv2.resize(self._current_frame, (self.output_size[0], self.output_size[1]), 
-               interpolation = cv2.INTER_LINEAR)"""
-        
-        cv2.imshow("Window", self._current_frame)
-        
-        if self._current_result != None and self._current_result.pose_landmarks:
+        try:
             return self._current_result.pose_landmarks[0]
-        else:
+        except (AttributeError, IndexError):
             return None
