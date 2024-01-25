@@ -1,6 +1,5 @@
 import math
 import os
-import time
 
 import mediapipe as mp
 from mediapipe.framework.formats import landmark_pb2
@@ -36,12 +35,7 @@ class PoseRecorder(Recorder):
         
     def _data_handler(self, result: PoseLandmarkerResult, image: mp.Image, timestamp: int) -> None:
         """Wrapper function for parent handler"""
-        global previous_time
         super()._data_handler(result, image, timestamp)
-        current_time = time.time()
-        fps = 1/(current_time-previous_time)
-        previous_time = current_time
-        #print(fps)
             
     def _draw_landmarks(self) -> None:
         """Draws pose landmarks and connections"""
