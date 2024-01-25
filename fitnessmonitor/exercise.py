@@ -1,5 +1,3 @@
-from typing import Literal
-
 class Exercise:
     exer_list = {}
     def __init__(self, 

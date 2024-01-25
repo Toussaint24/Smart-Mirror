@@ -4,7 +4,7 @@ from tkinter import Tk
 
 from fitnessmonitor.exercise import curl
 import fitnessmonitor.views as views
-from recorder.pose_landmarker import PoseRecorder
+from recorder import PoseRecorder
 
 joint_keypoint_dict = {
     "elbow_left": (12, 14, 16),
