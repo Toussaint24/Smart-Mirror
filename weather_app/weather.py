@@ -1,4 +1,6 @@
 #Working on it
+
+#Can make it loop and wait to get new data every 30 min
 import requests, json
 
 api_key = "nothing for now"
@@ -21,3 +23,18 @@ response = requests.get(complete_url)
 # convert json format data into
 # python format data
 x = response.json()
+
+# Now x contains list of nested dictionaries
+# Check the value of "cod" key is equal to
+# "404", means city is found otherwise,
+# city is not found
+if x["cod"] != "404":
+ 
+    # store the value of "main"
+    # key in variable y
+    y = x["main"]
+ 
+    # store the value corresponding
+    # to the "temp" key of y
+    current_temperature = y["temp"]
+ 
