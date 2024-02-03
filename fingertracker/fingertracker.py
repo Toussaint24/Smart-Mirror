@@ -66,13 +66,13 @@ class FingerTracker:
             y_coord = 1
             
         # Create deadzone for more consistent tracking
-        if math.dist((x_coord, y_coord), self.current_coords) < 0.06:
+        if math.dist((x_coord, y_coord), self.current_coords) < 0.05:
             x_coord = self.current_coords[0]
             y_coord = self.current_coords[1]
             
-            # If user points at a spot for 2 seconds, click the location
+            # If user points at a spot for a certain time, click the location
             if not self.timer.is_alive():
-                self.timer = threading.Timer(2, self.click)
+                self.timer = threading.Timer(1.25, self.click)
                 self.timer.start()
         else:
             # If user moves from the spot, do not click
@@ -103,7 +103,15 @@ class FingerTracker:
         # TODO: Test offset with mirror
         coords = self.get_screen_coords()
         if coords != None:
-            self.controller.position = coords
+            # Calculate velocity
+            x_dist = coords[0] - self.controller.position[0]
+            y_dist = coords[1] - self.controller.position[1]
+            scalar = 0.1   # Velocity multiplier
+            velocity = (x_dist*scalar, y_dist*scalar)
+            
+            # Update cursor location
+            position = (self.controller.position[0]+velocity[0], self.controller.position[1]+velocity[1])
+            self.controller.position = position
             
     def click(self):
         """Click the screen at the current cursor location"""
