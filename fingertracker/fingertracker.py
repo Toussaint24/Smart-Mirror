@@ -1,16 +1,19 @@
 import math
 import threading
+import time
 
 from pynput.mouse import Controller, Button
 
 from recorder import HandRecorder
-from recorder import HandLandmarkerResult 
+from recorder import HandLandmarkerResult
 
 class FingerTracker:
     """
     A controller that stimulates mouse movement using the direction of a pointed finger.
     """
-    KEYPOINTS = {"index":(5, 8)}
+    KEYPOINTS = {"index":(5, 8),
+                 "index_full":(5, 6, 7, 8)
+                 }
     
     def __init__(self, screen_size: tuple[int, int] = (256, 256)):
         """
@@ -23,37 +26,53 @@ class FingerTracker:
         self.screen_size = screen_size
         self.recorder = HandRecorder(self.screen_size)
         self.controller = Controller()
-        self.previous_coords = (0, 0)
-        self.current_coords = (0, 0)
+        self.result = None
         self.disable_click = False
         
     def init(self):
         """Initialize timer and turn on camera"""
         self.recorder.start_camera()
-        self.timer = threading.Timer(2, self.click)
+        self.timer = threading.Timer(1, lambda: None)
         
-    def _get_finger_direction(self, landmarks: HandLandmarkerResult, keypoints: tuple[int, int]):
-        """
-        Calculate and return the normalized coordinates on screen corresponding to a user's point
-
-        Args:
-            landmarks (HandLandmarkerResult): a mediapipe handlandmarker result object
-            keypoints (tuple[int, int]): a tuple with integers corresponding to the indices of the finger joints
-
-        Returns:
-            float: an (x, y) coordinate pair of normalized corrdinates corresponding to the user's pointed index finger
-        """
-        # Get joint coordinates
-        a = [landmarks[keypoints[0]].x, landmarks[keypoints[0]].y, abs(landmarks[0].z)-landmarks[keypoints[0]].z]
-        b = [landmarks[keypoints[1]].x, landmarks[keypoints[1]].y, abs(landmarks[0].z)-landmarks[keypoints[1]].z]
+    def _get_landmark_result(self) -> HandLandmarkerResult:
+        return self.recorder.run()
+    
+    def _get_landmark_depth(self, origin, landmark) -> float:
+        return abs(origin.z)-landmark.z
+    
+    def _get_finger_coords(self, keypoints, landmarks=None):
+        if landmarks == None:
+            landmarks = self._get_landmark_result()
+        if landmarks == None:
+            return None
         
-        # Get corresponding screen coordinates
+        coords = []
+        for i in range(len(keypoints)):
+            landmark = landmarks[keypoints[i]]
+            coords.append((landmark.x, landmark.y, self._get_landmark_depth(landmarks[0], landmark)))
+            
+        self.result = landmarks
+            
+        return tuple(coords)
+    
+    def _get_cross_section_coords(self, a: tuple[float, float, float], b: tuple[float, float, float], target: float):
         slope = (b[0]-a[0])/(b[2]-a[2])
-        x_coord = slope * (0.3 - a[2]) + a[0]
+        cross_x = slope * (target - a[2]) + a[0]
         
         slope = (b[1]-a[1])/(b[2]-a[2])
-        y_coord = slope * (0.3 - a[2]) + a[1]
+        cross_y = slope * (target - a[2]) + a[1]
         
+        return (cross_x, cross_y)
+    
+    def _get_intercept(self, keypoints: tuple[int, int]) -> None | tuple[float, float]:
+        try:
+            a, b = self._get_finger_coords(keypoints)
+        except TypeError:
+            return
+        
+        # Get corresponding screen coordinates
+        x_coord, y_coord = self._get_cross_section_coords(a, b, 0.3)
+
         # Constrain coordinates to normalized range
         if x_coord > 1:
             x_coord = 1
@@ -65,44 +84,54 @@ class FingerTracker:
         elif y_coord > 1:
             y_coord = 1
             
-        # Create deadzone for more consistent tracking
-        if math.dist((x_coord, y_coord), self.current_coords) < 0.05:
-            x_coord = self.current_coords[0]
-            y_coord = self.current_coords[1]
-            
-            # If user points at a spot for a certain time, click the location
-            if not self.timer.is_alive():
-                self.timer = threading.Timer(1.25, self.click)
-                self.timer.start()
-        else:
-            # If user moves from the spot, do not click
-            if self.timer.is_alive():
-                self.timer.cancel()
-
-        self.current_coords = (x_coord, y_coord)
+        # Get actualized screen coordinates
+        x_coord *= self.screen_size[0]
+        y_coord *= self.screen_size[1]
         
-        return self.current_coords
+        return (x_coord, y_coord)
     
-    def get_screen_coords(self):
-        """
-        Return the unnormalized location on screen an index finger is pointing at
+    def _pointing(self, landmarks):
+        # Check to see if index finger keypoints are on a line
+        # if finger tip depth is aligned with finger base, not pointing
+        coords = self._get_finger_coords(self.KEYPOINTS["index_full"], landmarks)
+        a = coords[0]
+        b = coords[3]
+        ERROR = 0.1
+        
+        expected_coords = []
+        z = coords[1][2]
+        expected_coords.append(self._get_cross_section_coords(a, b, z))
+        z = coords[2][2]
+        expected_coords.append(self._get_cross_section_coords(a, b, z))
+        
+        within_error = lambda a, b: True if math.dist(a, b) < ERROR else False
 
-        Returns:
-            tuple[int, int]: an (x, y) coordinate pair representing where on screen the user is pointing
-        """
-        results = self.recorder.run()
-        if results != None:
-            normalized_coords = self._get_finger_direction(results, self.KEYPOINTS["index"])
-            x = normalized_coords[0]*self.screen_size[0]
-            y = normalized_coords[1]*self.screen_size[1]
-
-            return (x, y)
-
+        if within_error(expected_coords[0], coords[1][0:2]) and within_error(expected_coords[1], coords[2][0:2]):
+            return True
+        else:
+            return False
+    
+    def _in_deadzone(self, a: tuple[float, float], b: tuple[float, float]) -> None:
+        if math.dist(a, b) < self.screen_size[0]*0.04:
+            return True
+        return False
+        
     def move_cursor(self):
         """Move the cursor to the location indicated by index finger"""
         # TODO: Test offset with mirror
-        coords = self.get_screen_coords()
-        if coords != None:
+        previous_time = time.time()
+        coords = self._get_intercept(self.KEYPOINTS["index"])
+        if coords != None and self._pointing(self.result):
+
+            if self._in_deadzone(coords, self.controller.position):
+                if not self.timer.is_alive():
+                    self.timer = threading.Timer(0.75, lambda: self.controller.click(Button.left))
+                    self.timer.start()
+                return
+            else:
+                if self.timer.is_alive():
+                    self.timer.cancel()
+            
             # Calculate velocity
             x_dist = coords[0] - self.controller.position[0]
             y_dist = coords[1] - self.controller.position[1]
@@ -113,7 +142,5 @@ class FingerTracker:
             position = (self.controller.position[0]+velocity[0], self.controller.position[1]+velocity[1])
             self.controller.position = position
             
-    def click(self):
-        """Click the screen at the current cursor location"""
-        if self.disable_click == False:
-            self.controller.click(Button.left)
+            fps = 1/(time.time()-previous_time)
+            print(fps)
