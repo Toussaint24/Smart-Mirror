@@ -23,9 +23,9 @@ class HandRecorder(Recorder):
         """Create and return hand landmarker"""
         return HandLandmarker.create_from_options(HandLandmarkerOptions(
             base_options=BaseOptions(model_asset_path=self.model),
-            min_hand_detection_confidence=0.9,
-            min_hand_presence_confidence=0.95,
-            min_tracking_confidence=0.9,
+            min_hand_detection_confidence=0.85,
+            min_hand_presence_confidence=0.9,
+            min_tracking_confidence=0.85,
             running_mode=VisionRunningMode.LIVE_STREAM,
             result_callback=self._data_handler)
         )
