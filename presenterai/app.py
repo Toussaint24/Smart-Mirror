@@ -18,12 +18,15 @@ class App(ctk.CTk):
         
         # Setup views
         Editing(self)
+        Stats(self)
+        
+        self.set_view("editing")
         
         self.mainloop()
         
     def set_view(self, pointer: str):
         try:
-            self.views_list[pointer].tkraise()
+            self.view_list[pointer].tkraise()
         except KeyError:
             raise ValueError(f"Unknown view '{pointer}'")
         
