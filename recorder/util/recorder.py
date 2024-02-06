@@ -11,6 +11,7 @@ class Recorder:
         self._current_frame = None
         self._current_result = None
         self._running = True
+        self._DEBUG = False
         
     def _init_detector(self):
         """Create and return vision detector model"""
@@ -29,7 +30,10 @@ class Recorder:
     def run(self) -> None:
         """Get camera feed and run hand landmarker"""
         # Get camera feed
-        _, frame = self._cap.read()
+        ret, frame = self._cap.read()
+        
+        if ret == False:
+            return
         
         # Image preprocessing
         frame = cv2.flip(frame, 1)
@@ -41,17 +45,18 @@ class Recorder:
         self._detector.detect_async(mp_image, timestamp)
         self._current_frame = frame           
         
-        # Visualization
-        if self._current_result != None:
-            self._draw_landmarks() 
-        
-        """self._current_frame = cv2.resize(self._current_frame, (self.output_size[0], self.output_size[1]), 
-               interpolation = cv2.INTER_LINEAR)"""
-        
-        cv2.imshow("Window", self._current_frame)
-        
-        if cv2.waitKey(1) == ord('q'):
-            self.close()
+        if self._DEBUG:
+            # Visualization
+            if self._current_result != None:
+                self._draw_landmarks() 
+            
+            """self._current_frame = cv2.resize(self._current_frame, (self.output_size[0], self.output_size[1]), 
+                interpolation = cv2.INTER_LINEAR)"""
+            
+            cv2.imshow("Window", self._current_frame)
+            
+            if cv2.waitKey(1) == ord('q'):
+                self.close()
     
     def close(self):
         self._running = False

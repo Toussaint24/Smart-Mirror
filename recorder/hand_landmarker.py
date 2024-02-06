@@ -47,7 +47,7 @@ class HandRecorder(Recorder):
                 mp_hands.HAND_CONNECTIONS,
                 mp_drawing_styles.get_default_hand_landmarks_style())
             
-    def run(self) -> None:
+    def run(self) -> HandLandmarkerResult | None:
         """Get camera feed and run hand landmarker"""
         super().run()
         
