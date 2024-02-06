@@ -11,7 +11,7 @@ class App(ctk.CTk):
         ctk.set_default_color_theme("blue")
         
         # Setup window
-        super().__init__()
+        super().__init__(fg_color= "black")
         self.attributes("-fullscreen", True)
         self.overrideredirect(True)
         self.resizable(False, False)
