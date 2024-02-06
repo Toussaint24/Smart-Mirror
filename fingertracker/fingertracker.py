@@ -135,10 +135,11 @@ class FingerTracker:
         """
         # Check to see if index finger keypoints are on a line
         # if finger tip depth is aligned with finger base, not pointing
+        # TODO: Test using angle instead (5, 6, 8)
         coords = self._get_finger_coords(self.KEYPOINTS["index_full"], landmarks)
         a = coords[0]
         b = coords[3]
-        ERROR = 0.1
+        ERROR = 0.085
         
         expected_coords = []
         z = coords[1][2]
