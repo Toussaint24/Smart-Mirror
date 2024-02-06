@@ -30,7 +30,10 @@ class Recorder:
     def run(self) -> None:
         """Get camera feed and run hand landmarker"""
         # Get camera feed
-        _, frame = self._cap.read()
+        ret, frame = self._cap.read()
+        
+        if ret == False:
+            return
         
         # Image preprocessing
         frame = cv2.flip(frame, 1)
