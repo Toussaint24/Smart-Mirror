@@ -1,8 +1,12 @@
+import threading
+
+
 class Exercise:
     exer_list = {}
     def __init__(self, 
                 name: str, 
                 primary_joints: dict[str, tuple[int, int]], 
+                messages: dict[str, tuple[str, str]],
                 constraining_joints: dict[str, tuple[int, int]] = {}
                 ):
         """
@@ -23,10 +27,43 @@ class Exercise:
         """
         self.name = name
         self.primary_joints = primary_joints
+        self.messages = messages
         self.constraining_joints = constraining_joints
+        self.previous_angles = dict(zip(self.primary_joints.keys(), [value[0] for value in self.primary_joints.values()]))
         self.exer_list[name] = self
+        self._timer = threading.Timer(3, lambda: None)
+        self.message = None
         
-    def process(self, position: int, angles: dict[str, int]) -> tuple[bool, bool]:
+    def clear_message(self):
+        self.message = ""    
+        
+    def update_message(self, message):
+        self.message = message
+        
+    def update_timer(self, cancel: bool = False, *, msg: str = ""):
+        if cancel:
+            # User found: Cancel inactivity timer
+            if self._timer.is_alive():
+                self._timer.cancel()
+        else:
+            # User not found: Begin inactivity timer
+            if not self._timer.is_alive():
+                self._timer = threading.Timer(1.75, self.update_message, args=(msg,))
+                self._timer.start()
+                
+    def angle_decreasing(self, joint: str, angle: int):
+        if angle < self.previous_angles[joint] - 3:
+            return True
+        else:
+            return False
+        
+    def angle_increasing(self, joint: str, angle: int):
+        if angle > self.previous_angles[joint] + 3:
+            return True
+        else:
+            return False
+        
+    def process(self, position: int, angles: dict[str, int]) -> tuple[bool, bool, None | str]:
         """
         Determine if passed results indicate proper progression of the exercise and return result
         
@@ -47,16 +84,31 @@ class Exercise:
         """
         primary_flag = False
         constraint_flag = False
+        
         for joint, angle in angles.items():
             
             if joint in self.primary_joints.keys():
                 
-                if position == 0:
+                if position == 1:
+                    # Go up
                     if angle <= min(self.primary_joints[joint]):
+                        self.update_timer(True)
+                        self.clear_message()
                         primary_flag = True
+                    else:
+                        if not self.angle_decreasing(joint, angle):
+                            message = self.messages[joint][0]
+                            self.update_timer(False, msg=message)
                 else:
+                    # Go down
                     if angle >= max(self.primary_joints[joint]):
+                        self.update_timer(True)
+                        self.clear_message()
                         primary_flag = True
+                    else:
+                        if not self.angle_increasing(joint, angle):
+                            message = self.messages[joint][1]
+                            self.update_timer(False, msg=message)
 
             elif joint in self.constraining_joints.keys():
                 
@@ -65,6 +117,8 @@ class Exercise:
                 elif angle > max(self.constraining_joints[joint]):
                     constraint_flag = True
         
+        self.previous_angles = angles
         return (primary_flag, constraint_flag)
-    
-curl = Exercise("curl_right", {"elbow_right": (10, 170)})
+
+curl_messages = ("Make sure to go all the way up", "Make sure to go all the way down")
+curl = Exercise("curl_right", {"elbow_right": (10, 170)}, {"elbow_right": curl_messages})
