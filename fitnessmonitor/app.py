@@ -1,9 +1,12 @@
 import sys
+import threading
+import time
 
 from tkinter import Tk
+import customtkinter as ctk
 
 from fitnessmonitor.exercise import curl
-import fitnessmonitor.views as views
+from fitnessmonitor.views import *
 from recorder import PoseRecorder
 
 joint_keypoint_dict = {
@@ -13,51 +16,92 @@ joint_keypoint_dict = {
     "shoulder_right": (23, 11, 13)
 }
 
-class App:
-    
-    def __init__(self, root: Tk):
-        self.root = root
-        self.root.grid_columnconfigure(0, weight=1)
-        self.root.grid_rowconfigure(0, weight=1) 
-        self._init_views()
+class App(ctk.CTk):
+    view_list = {}
+    def __init__(self):
+        ctk.set_appearance_mode("dark")
+        super().__init__(fg_color="black")
+        self.attributes("-fullscreen", True)
+        self.overrideredirect(True)
+        self.resizable(False, False)
+        
         self._recorder = PoseRecorder(
-                output_size=(self.root.winfo_screenwidth(), self.root.winfo_screenheight())
+                output_size=(self.winfo_screenwidth(), self.winfo_screenheight())
         )
-        self.position = 1
-        self.counter = 0
+        self._timer = threading.Timer(5, self.stop_recording)
+
+        self.position = ctk.IntVar(value=0)
+        self.position_str = ctk.StringVar(value="Direction:\ndown")
+        self.counter = ctk.StringVar(value="Reps:\n0")
+        self.message = ctk.StringVar(value="")
         
-    def _init_views(self):
-        self._main_view = views.MainView(self.root, self)
-        self._settings_view = views.SettingsView(self.root, self)
-        self._exercises_view = views.ExerciseListView(self.root, self)
-        self._recorder_view = views.RecorderView(self.root, self)
+        self.in_position = False
         
-        self.view_list = views.View.view_list
+        Main(self)
+        Settings(self)
+        ExerciseList(self)
+        Recorder(self)
         
         self.set_view("main")
+        self.mainloop()
+        print("Here")
         
     def set_view(self, pointer: str):
         self.view_list[pointer].tkraise()
         
+    def update_counter(self):
+        counter_message = self.counter.get()
+        counter_message = counter_message.replace(counter_message[-1], str(int(counter_message[-1])+1))
+        self.counter.set(counter_message)      
+        
+    def update_position(self):
+        if "down" in self.position_str.get():
+            self.position.set(1)
+            self.position_str.set("Direction:\nup")
+            if self.in_position:
+                self.update_counter()
+        else:
+            self.position.set(0)
+            self.position_str.set("Direction:\ndown")
+            
+    def update_timer(self, cancel: bool = False):
+        if cancel:
+            # User found: Cancel inactivity timer
+            if self._timer.is_alive():
+                self.message.set("")
+                self._timer.cancel()
+        else:
+            # User not found: Begin inactivity timer
+            if not self._timer.is_alive():
+                self.message.set("Status:\nNo user detected. Closing.")
+                self._timer = threading.Timer(5, self.stop_recording)
+                self._timer.start()
+        
     def run_exercise(self):
         joint = "elbow_right"
+        user_found = False # Boolean flag for inactivity timer
         data = self._recorder.run()
+        
         if data != None:
+            user_found = True
+            
+            # Get angle
             angle = self._recorder.get_angle(data, joint_keypoint_dict[joint])
-            dict_ = {joint: angle}
-            if angle == -1:
-                angle = 80
-            result = curl.process(self.position, dict_)
-            if result[0] == True:
-                if self.position == 1:
-                    self.position = 0
-                    self.counter += 1
-                    print("Up")
-                else:
-                    self.position = 1
-                    print("Down")
+
+            if angle != None:
+                primary_flag, constraint_flag = curl.process(self.position.get(), {joint: angle})
+                
+                if primary_flag == True:
+                    self.update_position()
+                    self.in_position = True
+                    
+                if curl.message != None:
+                    self.message.set(f"Status:\n{curl.message}")
+                    
+        self.update_timer(user_found)
+                
         if self._recorder._running:
-            self._recorder_view.after(1, self.run_exercise)
+            self.after(1, self.run_exercise)
         
     def record(self):
         self.current_exercise = curl.name
@@ -66,7 +110,7 @@ class App:
         self.run_exercise()
         
     def stop_recording(self):
-        self._recorder.close()
+        self._recorder._running = False
         self.set_view("main")
 
     def quit(self):
