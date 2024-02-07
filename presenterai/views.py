@@ -20,22 +20,40 @@ class Results(View):
         self.screenwidth = self.winfo_screenwidth()
         self.screenheight = self.winfo_screenheight()
         tabs = self.get_tabs()
-        tabs.pack(side="bottom", fill="x", ipady=self.screenheight*0.04)
+        tabs.pack(side="bottom", fill="x",ipady=self.screenheight*0.02)
         
     def get_tabs(self):
-        frame = ctk.CTkFrame(self)
+        frame = ctk.CTkFrame(self,bg_color="black")
         
         stats_button = ctk.CTkButton(frame, 
             text="Results",
-            corner_radius=1,
-            command=lambda: self._parent.set_view("stats"))
+            corner_radius=30,
+            command=lambda: self._parent.set_view("stats"),
+            font=("Courier New", 34),
+            fg_color= "black",
+            text_color= "white",
+            hover_color="#858282",
+            border_color="#eb6565",
+            border_width=1,
+            height= 30
+      
+            )
         editing_button = ctk.CTkButton(frame, 
             text="Editing",
-            corner_radius=1,
-            command=lambda: self._parent.set_view("editing"))
+            corner_radius=30,
+            command=lambda: self._parent.set_view("editing"),
+            font=("Courier New", 34),
+            fg_color= "black",
+            text_color= "white",
+            hover_color="#858282",
+            border_color="#eb6565",
+            border_width=1,
+            height= 30
+
+            )
         
-        stats_button.pack(side="left", expand=True, fill="both", padx=0.01)
-        editing_button.pack(side="left", expand=True, fill="both", padx=0.01)
+        stats_button.pack(side="left", expand=True, fill="both", padx=100)
+        editing_button.pack(side="left", expand=True, fill="both", padx=100)
         
         return frame
 
@@ -63,23 +81,35 @@ class Editing(Results):
         
         # Create buttons
         up_button = ctk.CTkButton(frame, 
-            text="^", 
-            text_color="white", 
+            text="^",
+            font=("Courier New", 45),
+            fg_color= "black",
+            text_color= "#eb6565",
+            hover_color="#858282",
+            height= 80, 
+            width= 70,
+            corner_radius= 200,
             command=lambda: self.text_frame._parent_canvas.yview_scroll(10, "units"))
         down_button = ctk.CTkButton(frame, 
-            text="v", 
-            text_color="white", 
+            text="V",
+            font=("Courier New", 23), 
+            fg_color= "black",
+            text_color= "#eb6565",
+            hover_color="#858282",
+            height= 80, 
+            width= 70,
+            corner_radius= 200, 
             command=lambda: self.text_frame._parent_canvas.yview_scroll(-10, "units"))
         
         # Place buttons
         padx = self.screenwidth*0.005
-        up_button.pack(side="left", expand=True, fill="both", padx=padx)
-        down_button.pack(side="left", expand=True, fill="both", padx=padx)
+        up_button.pack(side="left", expand=True, padx=padx)
+        down_button.pack(side="left", expand=True, padx=padx)
         
         return frame
     
     def get_editing_options(self):
-        frame = ctk.CTkFrame(self, fg_color="#2A2B2B")
+        frame = ctk.CTkFrame(self, fg_color="#000000")
         
         # Create grid
         frame.rowconfigure((0, 1), weight=1)
@@ -88,29 +118,45 @@ class Editing(Results):
         # Create options
         enhance_option = ctk.StringVar(value="")
         enhancement_options = ctk.CTkComboBox(frame, 
-            values=["grammar", "phrasing"],
-            font=("Calibri", 40),
-            dropdown_font=("Calibri", 40),
+            values=["Grammar", "Phrasing"],
+            font=("Courier New", 35),
+            text_color="white",
+            dropdown_font=("Courier New", 26),
+            fg_color="black",
+            button_color="#eb6565",
             height=self.screenheight*0.1,
             variable=enhance_option)
         suggest_option = ctk.StringVar(value="")
         suggestion_options = ctk.CTkComboBox(frame,
-            values=["suggestions", "feedback", "counters"],
-            font=("Calibri", 40),
-            dropdown_font=("Calibri", 40),
+            values=["Suggestions", "Feedback", "Counters"],
+            font=("Courier New", 35),
+            text_color="white",
+            dropdown_font=("Courier New", 26),
+            fg_color="black",
+            button_color="#eb6565",
             height=self.screenheight*0.1,
             variable=suggest_option)
         
         # Create buttons
-        enhance_button = ctk.CTkButton(frame, text="Enhance", command=lambda: self._parent.enhance(enhance_option.get()))
-        suggest_button = ctk.CTkButton(frame, text="Suggest", command=lambda: self._parent.suggest(suggest_option.get()))
+        enhance_button = ctk.CTkButton(frame, text="Enhance",
+                                       font=("Courier New", 35),
+                                       fg_color= "black",
+                                       text_color= "white",
+                                       hover_color="#858282",
+                                       command=lambda: self._parent.enhance(enhance_option.get()))
+        suggest_button = ctk.CTkButton(frame, text="Suggest",
+                                       font=("Courier New", 35),
+                                       fg_color= "black",
+                                       text_color= "white",
+                                       hover_color="#858282",
+                                       command=lambda: self._parent.suggest(suggest_option.get()))
         
         # Place widgets
         enhancement_options.grid(row=0, column=0, sticky="ew", padx=self.screenwidth*0.005)
         suggestion_options.grid(row=1, column=0, sticky="ew", padx=self.screenwidth*0.005)
         
-        enhance_button.grid(row=0, column=1, sticky="ew", padx=self.screenwidth*0.005, ipady=self.screenheight*0.05)
-        suggest_button.grid(row=1, column=1, sticky="ew", padx=self.screenwidth*0.005, ipady=self.screenheight*0.05)
+        enhance_button.grid(row=0, column=1, padx=self.screenwidth*0.005,ipady=self.screenheight*0.05)
+        suggest_button.grid(row=1, column=1, padx=self.screenwidth*0.005, ipady=self.screenheight*0.05)
         
         return frame
         
@@ -121,19 +167,31 @@ class Stats(Results):
         self.add_stat("Number of filler words:", "X")
         self.add_stat("Filler word frequency:", "X")
         
-        retry = ctk.CTkButton(self, text="Retry", command=lambda: print("Retrying"))
-        retry.pack(side="bottom", pady=self.screenheight*0.02, ipadx=self.screenwidth*0.07, ipady=self.screenheight*0.02)
+        retry = ctk.CTkButton(self, text="Retry",
+                              font=("Courier New", 35),
+                              fg_color= "black",
+                              text_color= "white",
+                              hover_color="#858282",
+                              corner_radius=50,
+                              command=lambda: print("Retrying"))
+        retry.pack(side="bottom", pady=self.screenheight*0.04, ipadx=self.screenwidth*0.07, ipady=self.screenheight*0.02)
         
     def add_stat(self, desc: str, result: str):
-        self.get_stat(desc, result).pack(fill="x", pady=self.screenheight*0.005)
+        self.get_stat(desc, result).pack(fill="x", pady=self.screenheight*0.002)
         
     def get_stat(self, desc: str, result: str) -> ctk.CTkFrame:
         frame = ctk.CTkFrame(self, fg_color="transparent", border_color="red")
         
-        desc_label = ctk.CTkLabel(frame, text=desc, fg_color="transparent", font=("Calibri", 60), anchor="w",)
-        result_label = ctk.CTkLabel(frame, text=result, fg_color="transparent", text_color="red", font=("Calibri", 60))
+        desc_label = ctk.CTkLabel(frame, text=desc,
+                                  fg_color="transparent",
+                                  font=("Courier New", 45),
+                                  anchor="w",)
+        result_label = ctk.CTkLabel(frame, text=result,
+                                    fg_color="transparent",
+                                    text_color="red",
+                                    font=("Courier New", 45))
         
-        desc_label.pack(side="left", padx=self.screenwidth*0.05)
-        result_label.pack(side="right", padx=self.screenwidth*0.2)
+        desc_label.pack(side="left", padx=self.screenwidth*0.05,pady=self.screenheight*0.05)
+        result_label.pack(side="right", padx=self.screenwidth*0.2,pady=self.screenheight*0.05)
         
         return frame
