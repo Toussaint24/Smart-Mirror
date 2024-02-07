@@ -2,7 +2,136 @@ import customtkinter as ctk
 
 from util.view import View
 
+#GUI for the recording
+class HomeScreen(View):
+    def __init__(self,name, parent):
+        super().__init__(name, parent)
+        self._initWidgets()
+        self.exit_button()
+        exit_button(self)
+        ctk.set_appearance_mode("dark")
 
+    def _initWidgets(self):
+        # Create grid
+        self.rowconfigure(0,1,2,3, weight=1)
+        self.columnconfigure(0,weight=1)
+        # Create widgets
+        app_title = ctk.CTkLabel(self, 
+            text="P R E S E N T E R  A I",  
+            font=("Helvetica",30),
+            text_color="white",
+            fg_color="black")
+        
+        desc_action = ctk.CTkLabel(self, 
+            text="press to begin",  
+            font=("Helvetica",20),
+            text_color="white",
+            fg_color="black")
+
+        start_button = ctk.CTkButton (self, text= ".",
+                                        font=("Helvetica",70),
+                                        anchor = "center",
+                                        height= 20, width=20,
+                                        corner_radius= 20,
+                                        text_color="#e8e4e3",
+                                        fg_color="#f51402",
+                                        hover_color= '#fc796f') 
+        # Place widgets
+        app_title.grid(row = 0, column = 0, rowspan = 2, sticky = 'nsew')
+        desc_action.grid(row = 3, column = 0, sticky = 'nsew')
+        start_button.grid(row = 3,column = 0)
+    pass
+
+class  exit_button(ctk.CTkButton):
+    def __init__(self,parent):
+        super().__init__(parent,text="X",  
+            font=("Helvetica",20),
+            text_color="white",
+            fg_color="black",
+            corner_radius= 10,
+            text_color="white",
+            fg_color="#f51402",
+            hover_color= '#fc796f'
+            )
+        self.grid(row = 0, column = 0, rowspan = 2, sticky = 'ne')
+    pass
+
+class RecordingScreen(HomeScreen):
+    def __init__(self, parent):
+        super().__init__("recording_sreen", parent)
+        self._initWidgets()
+        self.exit_button()
+        exit_button(self)
+        ctk.set_appearance_mode("dark")
+        
+
+    def _initWidgets(self):
+        # Create grid
+        self.columnconfigure(0,weight=1)
+        self.rowconfigure(0,1,2,3, weight=1, uniform='b')
+        # Create widgets
+
+        desc_action = ctk.CTkLabel(self,
+                                   text="Recording...",
+                                   font=("Helvetica",40),
+                                   text_color="white",
+                                   fg_color="black")
+
+        stop_button = ctk.CTkButton (self, text= "||",
+                                     font=("Helvetica",20),
+                                     anchor = "center",
+                                     height= 20, width=20,
+                                     corner_radius= 10,
+                                     text_color="#e8e4e3",
+                                     fg_color="#f51402",
+                                     hover_color= '#fc796f') 
+        # Place widgets
+        desc_action.grid(row = 1, column = 0, sticky = 'nsew')
+        stop_button.grid(row = 3,column = 0)
+    pass
+
+class StopSreeen(RecordingScreen):
+    def __init__(self, parent):
+        super().__init__("stop_sreen", parent)
+        self._initWidgets()
+        self.exit_button()
+        ctk.set_appearance_mode("dark")
+
+    def _initWidgets(self):
+        # Create grid
+        self.columnconfigure(0,1,weight=1)
+        self.rowconfigure(0,1,2,3, weight=1, uniform='c')
+        # Create widgets
+
+        desc_action = ctk.CTkLabel(self,
+                                   text="Let's continued...",
+                                   font=("Helvetica",40),
+                                   text_color="white",
+                                   fg_color="black")
+
+        resume_button = ctk.CTkButton (self, text= "resume",
+                                     font=("Helvetica",20),
+                                     anchor = "center",
+                                     height= 20, width=20,
+                                     corner_radius= 5,
+                                     text_color="#e8e4e3",
+                                     fg_color="#f51402",
+                                     hover_color= '#fc796f') 
+        done_button = ctk.CTkButton (self, text= "done",
+                                     font=("Helvetica",20),
+                                     anchor = "center",
+                                     height= 20, width=20,
+                                     corner_radius= 5,
+                                     text_color="#e8e4e3",
+                                     fg_color="#f51402",
+                                     hover_color= '#fc796f') 
+        # Place widgets
+        desc_action.grid(row = 1, column = 0,columnspan = 2,sticky = 'nsew')
+        resume_button.grid(row = 3,column = 0)
+        done_button.grid(row = 3, comlumn = 1)
+        pass
+
+#GUI for the speech
 class ScrollFrame(ctk.CTkScrollableFrame):
     def __init__(self, parent):
         super().__init__(parent)
