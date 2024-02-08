@@ -15,27 +15,27 @@ class HomeScreen(View):
         # Create widgets
         app_title = ctk.CTkLabel(self, 
             text="P R E S E N T E R  A I",  
-            font=("Helvetica",30),
+            font=("Helvetica",78),
             text_color="white",
             fg_color="black")
         
         desc_action = ctk.CTkLabel(self, 
-            text="press to begin",  
-            font=("Helvetica",20),
+            text="P r e s s  t o  b e g i n",  
+            font=("Helvetica",40),
             text_color="white",
             fg_color="black")
 
-        start_button = ctk.CTkButton (self, text= ".",
-                                        font=("Helvetica",70),
+        start_button = ctk.CTkButton (self, text= "⦿",
+                                        font=("Helvetica",90),
                                         anchor = "center",
-                                        height= 20, width=20,
-                                        corner_radius= 20,
+                                        height= 49, width=45,
+                                        corner_radius= 50,
                                         text_color="#e8e4e3",
-                                        fg_color="#f51402",
+                                        fg_color="#eb6565",
                                         hover_color= '#fc796f') 
         # Place widgets
-        app_title.grid(row = 0, column = 0, rowspan = 2, sticky = 'nsew')
-        desc_action.grid(row = 3, column = 0, sticky = 'nsew')
+        app_title.grid(row = 0, column = 0, rowspan = 2)
+        desc_action.grid(row = 2, column = 0)
         start_button.grid(row = 3,column = 0)
         super()._init_widgets()
 
@@ -51,21 +51,27 @@ class RecordingScreen(View):
         # Create widgets
 
         desc_action = ctk.CTkLabel(self,
-                                   text="Recording...",
+                                   text="R e c o r d i n g  . . .",
+                                   font=("Helvetica",80),
+                                   text_color="white",
+                                   fg_color="black")
+        desc_stop_action = ctk.CTkLabel(self,
+                                   text="P r e s s  t o  f i n i s h",
                                    font=("Helvetica",40),
                                    text_color="white",
                                    fg_color="black")
 
-        stop_button = ctk.CTkButton (self, text= "||",
-                                     font=("Helvetica",20),
+        stop_button = ctk.CTkButton (self, text= "⏸",
+                                     font=("Helvetica",90),
                                      anchor = "center",
-                                     height= 20, width=20,
-                                     corner_radius= 10,
+                                     height= 45, width=20,
+                                     corner_radius= 100,
                                      text_color="#e8e4e3",
-                                     fg_color="#f51402",
+                                     fg_color="#eb6565",
                                      hover_color= '#fc796f') 
         # Place widgets
-        desc_action.grid(row = 1, column = 0, sticky = 'nsew')
+        desc_action.grid(row = 1, column = 0)
+        desc_stop_action.grid(row = 2,column = 0 )
         stop_button.grid(row = 3,column = 0)
         super()._init_widgets()
 
@@ -81,29 +87,30 @@ class StopScreen(View):
         # Create widgets
 
         desc_action = ctk.CTkLabel(self,
-                                   text="Let's continued...",
-                                   font=("Helvetica",40),
+                                   text="L e t ' s  c o n t i n u e d  . . .",
+                                   font=("Helvetica",60),
                                    text_color="white",
                                    fg_color="black")
 
-        resume_button = ctk.CTkButton (self, text= "resume",
-                                     font=("Helvetica",20),
+        resume_button = ctk.CTkButton (self, text= "Resume",
+                                     font=("Helvetica",50),
                                      anchor = "center",
-                                     height= 20, width=20,
-                                     corner_radius= 5,
+                                     height= 120, width=230,
+                                     corner_radius= 50,
                                      text_color="#e8e4e3",
-                                     fg_color="#f51402",
-                                     hover_color= '#fc796f') 
-        done_button = ctk.CTkButton (self, text= "done",
-                                     font=("Helvetica",20),
+                                     fg_color="#eb6565",
+                                     hover_color= '#fc796f',
+                                    ) 
+        done_button = ctk.CTkButton (self, text= "Done",
+                                     font=("Helvetica",50),
                                      anchor = "center",
-                                     height= 20, width=20,
-                                     corner_radius= 5,
+                                     height= 120, width=290,
+                                     corner_radius= 50,
                                      text_color="#e8e4e3",
-                                     fg_color="#f51402",
+                                     fg_color="#eb6565",
                                      hover_color= '#fc796f') 
         # Place widgets
-        desc_action.grid(row = 1, column = 0,columnspan = 2,sticky = 'nsew')
+        desc_action.grid(row = 1, column = 0,columnspan = 2)
         resume_button.grid(row = 3,column = 0)
         done_button.grid(row = 3, column = 1)
         super()._init_widgets()

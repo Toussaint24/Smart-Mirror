@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from openai import OpenAI
 
-client = OpenAI()
+#client = OpenAI()
 import tkinter as tk
 from tkinter import ttk
 
@@ -52,29 +52,31 @@ class App(ctk.CTk):
             raise ValueError(f"Unknown view '{pointer}'")
         
     def edit(self, option: str, output: ctk.StringVar):
-        if option in enhancements_prompts.keys():
-            prompt = enhancements_prompts[option]
-            edit = "enhance"
-        elif option in suggestion_prompts.keys():
-            prompt = suggestion_prompts[option]
-            edit = "suggest"
-        message = output.get()
-        total_input = f"{prompt}\n\n{message}"
+        self.prompt.text_frame.text.set(output.get())
+        self.prompt.show()
+    #     if option in enhancements_prompts.keys():
+    #         prompt = enhancements_prompts[option]
+    #         edit = "enhance"
+    #     elif option in suggestion_prompts.keys():
+    #         prompt = suggestion_prompts[option]
+    #         edit = "suggest"
+    #     message = output.get()
+    #     total_input = f"{prompt}\n\n{message}"
         
-        if message and option:
-            self.messages.append({"role": "user", "content": total_input})
-            chat = client.chat.completions.create(model="gpt-3.5-turbo", 
-            messages=[
-                {
-                    "role": "user",
-                    "content": total_input
-                }
-            ], 
-            max_tokens=1000) 
-            reply = chat.choices[0].message.content
+    #     if message and option:
+    #         self.messages.append({"role": "user", "content": total_input})
+    #         chat = client.chat.completions.create(model="gpt-3.5-turbo", 
+    #         messages=[
+    #             {
+    #                 "role": "user",
+    #                 "content": total_input
+    #             }
+    #         ], 
+    #         max_tokens=1000) 
+    #         reply = chat.choices[0].message.content
             
-            if edit == "enhance":
-                output.set(reply)
-            elif edit == "suggest":
-                self.prompt.text_frame.text.set(reply)
-                self.prompt.show()
+    #         if edit == "enhance":
+    #             output.set(reply)
+    #         elif edit == "suggest":
+    #             self.prompt.text_frame.text.set(reply)
+    #             self.prompt.show()
