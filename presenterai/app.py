@@ -9,7 +9,7 @@ from .views import *
 
 enhancements_prompts = {
     "Grammar": "Can you edit the grammar in my essay?",
-    "Phrasing": "Can you edit the phrasing in my essay?"
+    "Phrasing": "Can you edit the phrasing in my essay to sound more impressive?"
 }
 suggestion_prompts = {
     "Suggestions": "Can you give me suggestions to improve my essay?",
@@ -29,8 +29,7 @@ class App(ctk.CTk):
         # Setup window
         super().__init__(fg_color= "black")
         self.attributes("-fullscreen", True)
-        self.overrideredirect(True)
-        self.resizable(False, False)
+        self.attributes("-type", "splash")
         
         # Setup views
         HomeScreen(self)
@@ -50,13 +49,18 @@ class App(ctk.CTk):
         try:
             self.view_list[pointer].tkraise()
         except KeyError:
-            raise ValueError(f"Unknown view '{pointer}'")    
+            raise ValueError(f"Unknown view '{pointer}'")
         
-    def enhance(self, option: str, output: ctk.StringVar):
-        prompt = enhancements_prompts[option]
+    def edit(self, option: str, output: ctk.StringVar):
+        if option in enhancements_prompts.keys():
+            prompt = enhancements_prompts[option]
+            edit = "enhance"
+        elif option in suggestion_prompts.keys():
+            prompt = suggestion_prompts[option]
+            edit = "suggest"
         message = output.get()
         total_input = f"{prompt}\n\n{message}"
-
+        
         if message and option:
             self.messages.append({"role": "user", "content": total_input})
             chat = client.chat.completions.create(model="gpt-3.5-turbo", 
@@ -67,15 +71,10 @@ class App(ctk.CTk):
                 }
             ], 
             max_tokens=1000) 
-            reply = chat.choices[0].message.content 
-            output.set(reply)
-        
-    def suggest(self, option: str, output: ctk.StringVar):
-        self.prompt.text_frame.text.set(output.get())
-        self.prompt.show()
-        """prompt = enhancements_prompts[option]
-        message = output.get()
-        total_input = f"{prompt}\n\n{message}"
-        
-        if message and option:
-            pass"""
+            reply = chat.choices[0].message.content
+            
+            if edit == "enhance":
+                output.set(reply)
+            elif edit == "suggest":
+                self.prompt.text_frame.text.set(reply)
+                self.prompt.show()

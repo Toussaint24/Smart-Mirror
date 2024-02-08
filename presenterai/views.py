@@ -308,13 +308,13 @@ class Editing(Results):
                                        fg_color= "black",
                                        text_color= "white",
                                        hover_color="#858282",
-                                       command=lambda: self._parent.enhance(enhance_option.get(), self.text_frame.text))
+                                       command=lambda: self._parent.edit(enhance_option.get(), self.text_frame.text))
         suggest_button = ctk.CTkButton(frame, text="Suggest",
                                        font=("Courier New", 35),
                                        fg_color= "black",
                                        text_color= "white",
                                        hover_color="#858282",
-                                       command=lambda: self._parent.suggest(suggest_option.get(), self.text_frame.text))
+                                       command=lambda: self._parent.edit(suggest_option.get(), self.text_frame.text))
         
         # Place widgets
         enhancement_options.grid(row=0, column=0, sticky="ew", padx=self.screenwidth*0.005)
