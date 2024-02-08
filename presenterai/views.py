@@ -15,13 +15,13 @@ class HomeScreen(View):
         # Create widgets
         app_title = ctk.CTkLabel(self, 
             text="P R E S E N T E R  A I",  
-            font=("Helvetica",78),
+            font=("Helvetica",82),
             text_color="white",
             fg_color="black")
         
         desc_action = ctk.CTkLabel(self, 
             text="P r e s s  t o  b e g i n",  
-            font=("Helvetica",40),
+            font=("Helvetica",50),
             text_color="white",
             fg_color="black")
 
@@ -52,12 +52,12 @@ class RecordingScreen(View):
 
         desc_action = ctk.CTkLabel(self,
                                    text="R e c o r d i n g  . . .",
-                                   font=("Helvetica",80),
+                                   font=("Helvetica",85),
                                    text_color="white",
                                    fg_color="black")
         desc_stop_action = ctk.CTkLabel(self,
                                    text="P r e s s  t o  f i n i s h",
-                                   font=("Helvetica",40),
+                                   font=("Helvetica",50),
                                    text_color="white",
                                    fg_color="black")
 
@@ -88,7 +88,7 @@ class StopScreen(View):
 
         desc_action = ctk.CTkLabel(self,
                                    text="L e t ' s  c o n t i n u e d  . . .",
-                                   font=("Helvetica",60),
+                                   font=("Helvetica",85),
                                    text_color="white",
                                    fg_color="black")
 
@@ -150,7 +150,7 @@ class ScrollFrame(ctk.CTkScrollableFrame):
         
 class ScrollButtons(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent, fg_color="#2A2B2B")
+        super().__init__(parent, fg_color="black")
         self.parent = parent
         
         # Create buttons
@@ -161,8 +161,10 @@ class ScrollButtons(ctk.CTkFrame):
             text_color= "#eb6565",
             hover_color="#858282",
             height= 80, 
-            width= 70,
-            corner_radius= 200,
+            width= 5,
+            corner_radius= 100,
+            border_color="white",
+            border_width=1,
             command=lambda: self.parent.text_frame._parent_canvas.yview_scroll(-10, "units"))
         down_button = ctk.CTkButton(self, 
             text="V",
@@ -170,6 +172,8 @@ class ScrollButtons(ctk.CTkFrame):
             fg_color= "black",
             text_color= "#eb6565",
             hover_color="#858282",
+            border_color="white",
+            border_width=1,
             height= 80, 
             width= 70,
             corner_radius= 200, 
@@ -315,20 +319,27 @@ class Editing(Results):
                                        fg_color= "black",
                                        text_color= "white",
                                        hover_color="#858282",
+                                       border_color="#9e9a99",
+                                       border_width= 1,
+                                       width=200,
+            
                                        command=lambda: self._parent.edit(enhance_option.get(), self.text_frame.text))
         suggest_button = ctk.CTkButton(frame, text="Suggest",
                                        font=("Courier New", 35),
                                        fg_color= "black",
                                        text_color= "white",
                                        hover_color="#858282",
+                                       border_color="#9e9a99",
+                                       border_width= 1,
+                                       width=200,
                                        command=lambda: self._parent.edit(suggest_option.get(), self.text_frame.text))
         
         # Place widgets
         enhancement_options.grid(row=0, column=0, sticky="ew", padx=self.screenwidth*0.005)
         suggestion_options.grid(row=1, column=0, sticky="ew", padx=self.screenwidth*0.005)
         
-        enhance_button.grid(row=0, column=1, padx=self.screenwidth*0.005,ipady=self.screenheight*0.05)
-        suggest_button.grid(row=1, column=1, padx=self.screenwidth*0.005, ipady=self.screenheight*0.05)
+        enhance_button.grid(row=0, column=1, padx=self.screenwidth*0.005,ipady=self.screenheight*0.005)
+        suggest_button.grid(row=1, column=1, padx=self.screenwidth*0.005, ipady=self.screenheight*0.005)
         
         return frame
         
