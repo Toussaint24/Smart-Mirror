@@ -50,38 +50,6 @@ class PoseRecorder(Recorder):
                 mp_pose.POSE_CONNECTIONS,
                 mp_drawing_styles.get_default_pose_landmarks_style())
             
-    def get_angle(self, landmarks, keypoints) -> int:
-        """
-        Calculate and return middle angle of keypoints
-
-        Returns:
-            angle (int): angle of inner elbow in degrees. -1 if no angle found. [0, 180] otherwise.
-        """
-        # Determine visible joints
-        joints = [keypoints[0], keypoints[1], keypoints[2]]
-        visible = [landmarks[joint].visibility > 0.5 for joint in joints]
-        
-        if all(visible):
-            # Get joint coordinates
-            a = [landmarks[keypoints[0]].x, landmarks[keypoints[0]].y]
-            b = [landmarks[keypoints[1]].x, landmarks[keypoints[1]].y]
-            c = [landmarks[keypoints[2]].x, landmarks[keypoints[2]].y]
-            
-            # Get distances of joints
-            a_to_b = math.dist(a, b)
-            b_to_c = math.dist(b, c)
-            c_to_a = math.dist(c, a)
-            
-            # Use law of cosines to get angle and convert to degrees
-            radians = math.acos(
-                (c_to_a**2 - (a_to_b**2 + b_to_c**2))/(-2*a_to_b*b_to_c)
-                )
-            angle = abs(radians*180/math.pi)
-        else:
-            return -1
-                
-        return angle
-            
     def run(self) -> None:
         """Get camera feed and run pose landmarker"""
         super().run()

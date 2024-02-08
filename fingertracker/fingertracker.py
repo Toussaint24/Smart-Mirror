@@ -1,5 +1,6 @@
 import math
 import threading
+import time
 
 from mediapipe.tasks.python.components.containers.landmark import NormalizedLandmark
 from pynput.mouse import Controller, Button
@@ -12,9 +13,10 @@ class FingerTracker:
     """
     A controller that stimulates mouse movement using the direction of a pointed finger.
     """
-    KEYPOINTS = {"index":(5, 8),
-                 "index_full":(5, 6, 7, 8)
-                 }
+    KEYPOINTS = {
+        "index":(5, 8),
+        "index_full":(5, 6, 7, 8)
+        }
     
     def __init__(self, screen_size: tuple[int, int] = (256, 256)):
         """
@@ -29,7 +31,8 @@ class FingerTracker:
         self.controller = Controller()
         self.result = None
         self.disable_click = False
-        self.DEADZONE = 0.04*self.screen_size[0]
+        self.CLICK_DEADZONE = 0.035*self.screen_size[0]
+        self.MOVE_DEADZONE = 0.02*self.screen_size[0]
         
     def init(self):
         """Initialize timer and turn on camera"""
@@ -52,7 +55,7 @@ class FingerTracker:
         """
         return abs(origin.z)-landmark.z
     
-    def _get_finger_coords(self, keypoints: tuple[int, ...], landmarks: HandLandmarkerResult = None):
+    def _get_finger_coords(self, keypoints: tuple[int, ...], landmarks: HandLandmarkerResult | None = None):
         """Return the three-dimensional coordinates of the target finger as seen on the camera"""
         if landmarks == None:
             landmarks = self._get_landmark_result()
@@ -62,7 +65,6 @@ class FingerTracker:
         coords = []
         for i in range(len(keypoints)):
             landmark = landmarks[keypoints[i]]
-            print(type(landmark))
             coords.append((landmark.x, landmark.y, self._get_landmark_depth(landmarks[0], landmark)))
             
         self.result = landmarks
@@ -124,7 +126,7 @@ class FingerTracker:
         
         return (x_coord, y_coord)
     
-    def _pointing(self, landmarks: HandLandmarkerResult):
+    def _pointing(self):
         """Return a boolean value indicating if there is a user pointing at the camera.
 
         Args:
@@ -135,11 +137,10 @@ class FingerTracker:
         """
         # Check to see if index finger keypoints are on a line
         # if finger tip depth is aligned with finger base, not pointing
-        # TODO: Test using angle instead (5, 6, 8)
-        coords = self._get_finger_coords(self.KEYPOINTS["index_full"], landmarks)
+        coords = self._get_finger_coords(self.KEYPOINTS["index_full"], self.result)
         a = coords[0]
         b = coords[3]
-        ERROR = 0.085
+        ERROR = 0.1
         
         expected_coords = []
         z = coords[1][2]
@@ -154,7 +155,7 @@ class FingerTracker:
         else:
             return False
     
-    def _in_deadzone(self, a: tuple[float, float], b: tuple[float, float]) -> None:
+    def _in_deadzone(self, a: tuple[float, float], b: tuple[float, float], deadzone: float) -> None:
         """Return a boolean value indicating if the point is in the established deadzone.
 
         Args:
@@ -164,7 +165,7 @@ class FingerTracker:
         Returns:
             bool: True if the point is outside the deadzone. Otherwise False.
         """
-        if math.dist(a, b) < self.screen_size[0]*0.04:
+        if math.dist(a, b) < deadzone:
             return True
         return False
         
@@ -172,21 +173,24 @@ class FingerTracker:
         """Move the cursor to the location indicated by index finger"""
         # TODO: Test offset with mirror
         coords = self._get_intercept(self.KEYPOINTS["index"])
-        if coords != None and self._pointing(self.result):
 
-            if self._in_deadzone(coords, self.controller.position):
+        if coords != None and self._pointing():
+
+            if self._in_deadzone(coords, self.controller.position, self.CLICK_DEADZONE):
                 if not self.timer.is_alive():
                     self.timer = threading.Timer(0.75, lambda: self.controller.click(Button.left))
                     self.timer.start()
-                return
             else:
                 if self.timer.is_alive():
                     self.timer.cancel()
+                    
+            if self._in_deadzone(coords, self.controller.position, self.MOVE_DEADZONE):
+                return
             
             # Calculate velocity
             x_dist = coords[0] - self.controller.position[0]
             y_dist = coords[1] - self.controller.position[1]
-            scalar = 0.1   # Velocity multiplier
+            scalar = 0.07   # Velocity multiplier
             velocity = (x_dist*scalar, y_dist*scalar)
             
             # Update cursor location

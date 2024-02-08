@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 .vscode
 .env
 env
+=======
+env
+__pycache__
+.env
+>>>>>>> 7311901a6bdea1d5f9032e5f4da7907a12aa8fd6

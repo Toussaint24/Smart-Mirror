@@ -15,27 +15,28 @@ class HomeScreen(View):
         # Create widgets
         app_title = ctk.CTkLabel(self, 
             text="P R E S E N T E R  A I",  
-            font=("Helvetica",30),
+            font=("Helvetica",82),
             text_color="white",
             fg_color="black")
         
         desc_action = ctk.CTkLabel(self, 
-            text="press to begin",  
-            font=("Helvetica",20),
+            text="P r e s s  t o  b e g i n",  
+            font=("Helvetica",50),
             text_color="white",
             fg_color="black")
 
-        start_button = ctk.CTkButton (self, text= ".",
-                                        font=("Helvetica",70),
+        start_button = ctk.CTkButton (self, text= "⦿",
+                                        font=("Helvetica",90),
                                         anchor = "center",
-                                        height= 20, width=20,
-                                        corner_radius= 20,
+                                        height= 49, width=45,
+                                        corner_radius= 50,
                                         text_color="#e8e4e3",
-                                        fg_color="#f51402",
-                                        hover_color= '#fc796f') 
+                                        fg_color="#eb6565",
+                                        hover_color= '#fc796f',
+                                        command=self._parent.record) 
         # Place widgets
-        app_title.grid(row = 0, column = 0, rowspan = 2, sticky = 'nsew')
-        desc_action.grid(row = 3, column = 0, sticky = 'nsew')
+        app_title.grid(row = 0, column = 0, rowspan = 2)
+        desc_action.grid(row = 2, column = 0)
         start_button.grid(row = 3,column = 0)
         super()._init_widgets()
 
@@ -51,21 +52,28 @@ class RecordingScreen(View):
         # Create widgets
 
         desc_action = ctk.CTkLabel(self,
-                                   text="Recording...",
-                                   font=("Helvetica",40),
+                                   text="R e c o r d i n g  . . .",
+                                   font=("Helvetica",85),
+                                   text_color="white",
+                                   fg_color="black")
+        desc_stop_action = ctk.CTkLabel(self,
+                                   text="P r e s s  t o  f i n i s h",
+                                   font=("Helvetica",50),
                                    text_color="white",
                                    fg_color="black")
 
-        stop_button = ctk.CTkButton (self, text= "||",
-                                     font=("Helvetica",20),
+        stop_button = ctk.CTkButton (self, text= "⏸",
+                                     font=("Helvetica",90),
                                      anchor = "center",
-                                     height= 20, width=20,
-                                     corner_radius= 10,
+                                     height= 45, width=20,
+                                     corner_radius= 100,
                                      text_color="#e8e4e3",
-                                     fg_color="#f51402",
-                                     hover_color= '#fc796f') 
+                                     fg_color="#eb6565",
+                                     hover_color= '#fc796f',
+                                     command=self._parent.pause) 
         # Place widgets
-        desc_action.grid(row = 1, column = 0, sticky = 'nsew')
+        desc_action.grid(row = 1, column = 0)
+        desc_stop_action.grid(row = 2,column = 0 )
         stop_button.grid(row = 3,column = 0)
         super()._init_widgets()
 
@@ -81,29 +89,32 @@ class StopScreen(View):
         # Create widgets
 
         desc_action = ctk.CTkLabel(self,
-                                   text="Let's continued...",
-                                   font=("Helvetica",40),
+                                   text="L e t ' s  c o n t i n u e d  . . .",
+                                   font=("Helvetica",85),
                                    text_color="white",
                                    fg_color="black")
 
-        resume_button = ctk.CTkButton (self, text= "resume",
-                                     font=("Helvetica",20),
+        resume_button = ctk.CTkButton (self, text= "Resume",
+                                     font=("Helvetica",50),
                                      anchor = "center",
-                                     height= 20, width=20,
-                                     corner_radius= 5,
+                                     height= 120, width=230,
+                                     corner_radius= 50,
                                      text_color="#e8e4e3",
-                                     fg_color="#f51402",
-                                     hover_color= '#fc796f') 
-        done_button = ctk.CTkButton (self, text= "done",
-                                     font=("Helvetica",20),
+                                     fg_color="#eb6565",
+                                     hover_color= '#fc796f',
+                                     command=self._parent.play
+                                    ) 
+        done_button = ctk.CTkButton (self, text= "Done",
+                                     font=("Helvetica",50),
                                      anchor = "center",
-                                     height= 20, width=20,
-                                     corner_radius= 5,
+                                     height= 120, width=290,
+                                     corner_radius= 50,
                                      text_color="#e8e4e3",
-                                     fg_color="#f51402",
-                                     hover_color= '#fc796f') 
+                                     fg_color="#eb6565",
+                                     hover_color= '#fc796f',
+                                     command=self._parent.stop) 
         # Place widgets
-        desc_action.grid(row = 1, column = 0,columnspan = 2,sticky = 'nsew')
+        desc_action.grid(row = 1, column = 0,columnspan = 2)
         resume_button.grid(row = 3,column = 0)
         done_button.grid(row = 3, column = 1)
         super()._init_widgets()
@@ -112,13 +123,7 @@ class StopScreen(View):
 class ScrollFrame(ctk.CTkScrollableFrame):
     def __init__(self, parent):
         super().__init__(parent)
-        self.text = ctk.StringVar(value=
-            """Winston Churchill is widely regarded as one of the most effective leaders of the 20th century, particularly for his leadership during World War Il. However, what made Churchill's leadership style so successful? One way to answer this question is by
-            examining his leadership style through Blake and Mouton's Managerial Leadership Grid. The Managerial Leadership Grid is a tool that assesses a leader's concern for task completion and concern for people, resulting in five leadership styles: impoverished, country club, middle-of-the-road, team, and authority-compliance. Based on his actions and behaviors during World War Il, it is likely that Churchill's leadership style falls under the authority-compliance category of the Grid. This style is characterized by a high
-            concern for task completion and a low concern for people. Despite its limitations, Churchill's authority-compliance leadership style proved highly effective during the war. He was able to rally the British people and coordinate the country's war efforts, ultimately leading to victory over Nazi Germany. However, this style also had its drawbacks, such as the strain it put on Churchill's relationships with his
-            subordinates and the potential for burnout. While Churchill's leadership style may not be suitable for all contexts, it provides valuable insights into the complex interplay between task completion and concern for people in leadership. By using the Managerial Leadership Grid to analyze Churchill's leadership style, we can learn from his successes and limitations and apply these lessons to
-            contemporary leadership development. In conclusion, Winston Churchill's leadership during World War II exemplifies the authority-compliance leadership style as identified by Blake and Mouton's Managerial Leadership Grid. While this style may not be appropriate for all situations, it proved highly effective in rallying a country and leading it to victory. By examining Churchill's leadership style through the Grid, we can gain valuable insights into the role of task completion and concern for people in effective leadership, and apply these lessons to contemporary
-            organizational contexts.""")
+        self.text = ctk.StringVar(value="Lorem")
         self.label = ctk.CTkLabel(self, 
             textvariable=self.text, 
             justify="left", 
@@ -129,7 +134,7 @@ class ScrollFrame(ctk.CTkScrollableFrame):
         self.update_idletasks()
         self.height = self.winfo_height()
         self.width = self.winfo_width()
-        self.label.configure(wraplength=self.width)
+        self.label.configure(wraplength=600)
 
     def pack(self, **kwargs):
         super().pack(**kwargs)
@@ -143,7 +148,7 @@ class ScrollFrame(ctk.CTkScrollableFrame):
         
 class ScrollButtons(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent, fg_color="#2A2B2B")
+        super().__init__(parent)
         self.parent = parent
         
         # Create buttons
@@ -154,8 +159,10 @@ class ScrollButtons(ctk.CTkFrame):
             text_color= "#eb6565",
             hover_color="#858282",
             height= 80, 
-            width= 70,
-            corner_radius= 200,
+            width= 5,
+            corner_radius= 100,
+            border_color="white",
+            border_width=1,
             command=lambda: self.parent.text_frame._parent_canvas.yview_scroll(-10, "units"))
         down_button = ctk.CTkButton(self, 
             text="V",
@@ -163,6 +170,8 @@ class ScrollButtons(ctk.CTkFrame):
             fg_color= "black",
             text_color= "#eb6565",
             hover_color="#858282",
+            border_color="white",
+            border_width=1,
             height= 80, 
             width= 70,
             corner_radius= 200, 
@@ -176,16 +185,16 @@ class ScrollButtons(ctk.CTkFrame):
         
 class Prompt(ctk.CTkFrame):
     def __init__(self, parent, message: str = ""):
-        super().__init__(parent, corner_radius=27, border_color="red", border_width=2)
+        super().__init__(parent, corner_radius=27,bg_color="#535454",fg_color="#535454")
         self._parent = parent
         self.pack_propagate(False)
-        self.place(relx=0.5, rely=0.4, relwidth=0.6, relheight=0.5, anchor="center")
+        self.place(relx=0.3, rely=0.4, relwidth=0.6, relheight=0.5, anchor="center")
         self.update_idletasks()
         self.width = self.winfo_width()
         self.height = self.winfo_height()
         self.text_frame = ScrollFrame(self)
         self.text_frame.text.set(message)
-        self.text_frame.label.configure(fg_color="black", text_color="white")
+        self.text_frame.label.configure(text_color="white")
         self.text_frame.pack(
             expand=True, 
             fill="both",
@@ -193,18 +202,22 @@ class Prompt(ctk.CTkFrame):
             pady=self.height*0.03, 
         )
         self.scroll_buttons = ScrollButtons(self)
-        self.scroll_buttons.pack(fill="x")
+        self.scroll_buttons.pack(pady = 4,fill="x")
         self.confirm = ctk.CTkButton(self, 
-            text="Confirm", 
-            fg_color="black", 
-            border_color="red", 
+            text="Confirm",
+            font=("Courier New", 29), 
+            fg_color="#eb6565", 
+            border_color="white", 
             border_width=2, 
             text_color="white",
+            height= 30,
+            width= 50,
+            hover_color="#d49292",
             command=self.hide)
-        self.confirm.pack()
+        self.confirm.pack(pady= 10)
     
     def show(self):
-        self.place(relx=0.5, rely=0.4, relwidth=0.6, relheight=0.5, anchor="center")
+        self.place(relx=0.5, rely=0.4, relwidth=0.8, relheight=0.767, anchor="center")
         self.tkraise()
     
     def hide(self):
@@ -308,20 +321,27 @@ class Editing(Results):
                                        fg_color= "black",
                                        text_color= "white",
                                        hover_color="#858282",
+                                       border_color="#9e9a99",
+                                       border_width= 1,
+                                       width=200,
+            
                                        command=lambda: self._parent.edit(enhance_option.get(), self.text_frame.text))
         suggest_button = ctk.CTkButton(frame, text="Suggest",
                                        font=("Courier New", 35),
                                        fg_color= "black",
                                        text_color= "white",
                                        hover_color="#858282",
+                                       border_color="#9e9a99",
+                                       border_width= 1,
+                                       width=200,
                                        command=lambda: self._parent.edit(suggest_option.get(), self.text_frame.text))
         
         # Place widgets
         enhancement_options.grid(row=0, column=0, sticky="ew", padx=self.screenwidth*0.005)
         suggestion_options.grid(row=1, column=0, sticky="ew", padx=self.screenwidth*0.005)
         
-        enhance_button.grid(row=0, column=1, padx=self.screenwidth*0.005,ipady=self.screenheight*0.05)
-        suggest_button.grid(row=1, column=1, padx=self.screenwidth*0.005, ipady=self.screenheight*0.05)
+        enhance_button.grid(row=0, column=1, padx=self.screenwidth*0.005,ipady=self.screenheight*0.005)
+        suggest_button.grid(row=1, column=1, padx=self.screenwidth*0.005, ipady=self.screenheight*0.005)
         
         return frame
         
@@ -338,8 +358,9 @@ class Stats(Results):
                               text_color= "white",
                               hover_color="#858282",
                               corner_radius=50,
-                              command=lambda: print("Retrying"))
+                              command=lambda: self._parent.set_view("home"))
         retry.pack(side="bottom", pady=self.screenheight*0.04, ipadx=self.screenwidth*0.07, ipady=self.screenheight*0.02)
+        super()._init_widgets()
         
     def add_stat(self, desc: str, result: str):
         self.get_stat(desc, result).pack(fill="x", pady=self.screenheight*0.002)
