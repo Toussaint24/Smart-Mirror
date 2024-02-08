@@ -5,12 +5,12 @@ import customtkinter as ctk
 
 class View(ctk.CTkFrame):
     def __init__(self, name: str, parent: tk.Tk):
-        super().__init__(parent, bg_color="black")
+        super().__init__(parent, bg_color="black",fg_color="black")
         self._parent = parent
         self._parent.view_list[name] = self
         # self.canvas = ctk.CTkCanvas(self,background = "black")
         # self.canvas.pack(expand=True, fill='both')
-        self.frame = ctk.CTkFrame(self)
+        #self.frame = ctk.CTkFrame(self,fg_color="black")
         self.place(relwidth=1.0, relheight=1.0)
         self.pack_propagate(False)
 
