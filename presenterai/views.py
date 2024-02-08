@@ -150,7 +150,7 @@ class ScrollFrame(ctk.CTkScrollableFrame):
         
 class ScrollButtons(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent, fg_color="black")
+        super().__init__(parent,fg_color="black")
         self.parent = parent
         
         # Create buttons
@@ -187,16 +187,16 @@ class ScrollButtons(ctk.CTkFrame):
         
 class Prompt(ctk.CTkFrame):
     def __init__(self, parent, message: str = ""):
-        super().__init__(parent, corner_radius=27, border_color="red", border_width=2)
+        super().__init__(parent, corner_radius=27,bg_color="#535454",fg_color="#535454")
         self._parent = parent
         self.pack_propagate(False)
-        self.place(relx=0.5, rely=0.4, relwidth=0.6, relheight=0.5, anchor="center")
+        self.place(relx=0.3, rely=0.4, relwidth=0.6, relheight=0.5, anchor="center")
         self.update_idletasks()
         self.width = self.winfo_width()
         self.height = self.winfo_height()
         self.text_frame = ScrollFrame(self)
         self.text_frame.text.set(message)
-        self.text_frame.label.configure(fg_color="black", text_color="white")
+        self.text_frame.label.configure(text_color="white")
         self.text_frame.pack(
             expand=True, 
             fill="both",
@@ -204,18 +204,22 @@ class Prompt(ctk.CTkFrame):
             pady=self.height*0.03, 
         )
         self.scroll_buttons = ScrollButtons(self)
-        self.scroll_buttons.pack(fill="x")
+        self.scroll_buttons.pack(pady = 4,fill="x")
         self.confirm = ctk.CTkButton(self, 
-            text="Confirm", 
-            fg_color="black", 
-            border_color="red", 
+            text="Confirm",
+            font=("Courier New", 29), 
+            fg_color="#eb6565", 
+            border_color="white", 
             border_width=2, 
             text_color="white",
+            height= 30,
+            width= 50,
+            hover_color="#d49292",
             command=self.hide)
-        self.confirm.pack()
+        self.confirm.pack(pady= 10)
     
     def show(self):
-        self.place(relx=0.5, rely=0.4, relwidth=0.6, relheight=0.5, anchor="center")
+        self.place(relx=0.5, rely=0.4, relwidth=0.8, relheight=0.767, anchor="center")
         self.tkraise()
     
     def hide(self):
