@@ -32,7 +32,8 @@ class HomeScreen(View):
                                         corner_radius= 50,
                                         text_color="#e8e4e3",
                                         fg_color="#eb6565",
-                                        hover_color= '#fc796f') 
+                                        hover_color= '#fc796f',
+                                        command=self._parent.record) 
         # Place widgets
         app_title.grid(row = 0, column = 0, rowspan = 2)
         desc_action.grid(row = 2, column = 0)
@@ -68,7 +69,8 @@ class RecordingScreen(View):
                                      corner_radius= 100,
                                      text_color="#e8e4e3",
                                      fg_color="#eb6565",
-                                     hover_color= '#fc796f') 
+                                     hover_color= '#fc796f',
+                                     command=self._parent.pause) 
         # Place widgets
         desc_action.grid(row = 1, column = 0)
         desc_stop_action.grid(row = 2,column = 0 )
@@ -100,6 +102,7 @@ class StopScreen(View):
                                      text_color="#e8e4e3",
                                      fg_color="#eb6565",
                                      hover_color= '#fc796f',
+                                     command=self._parent.play
                                     ) 
         done_button = ctk.CTkButton (self, text= "Done",
                                      font=("Helvetica",50),
@@ -108,7 +111,8 @@ class StopScreen(View):
                                      corner_radius= 50,
                                      text_color="#e8e4e3",
                                      fg_color="#eb6565",
-                                     hover_color= '#fc796f') 
+                                     hover_color= '#fc796f',
+                                     command=self._parent.stop) 
         # Place widgets
         desc_action.grid(row = 1, column = 0,columnspan = 2)
         resume_button.grid(row = 3,column = 0)
@@ -130,7 +134,7 @@ class ScrollFrame(ctk.CTkScrollableFrame):
         self.update_idletasks()
         self.height = self.winfo_height()
         self.width = self.winfo_width()
-        self.label.configure(wraplength=self.width)
+        self.label.configure(wraplength=600)
 
     def pack(self, **kwargs):
         super().pack(**kwargs)
@@ -144,7 +148,7 @@ class ScrollFrame(ctk.CTkScrollableFrame):
         
 class ScrollButtons(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent,fg_color="black")
+        super().__init__(parent)
         self.parent = parent
         
         # Create buttons
@@ -354,8 +358,9 @@ class Stats(Results):
                               text_color= "white",
                               hover_color="#858282",
                               corner_radius=50,
-                              command=lambda: print("Retrying"))
+                              command=lambda: self._parent.set_view("home"))
         retry.pack(side="bottom", pady=self.screenheight*0.04, ipadx=self.screenwidth*0.07, ipady=self.screenheight*0.02)
+        super()._init_widgets()
         
     def add_stat(self, desc: str, result: str):
         self.get_stat(desc, result).pack(fill="x", pady=self.screenheight*0.002)
