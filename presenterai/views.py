@@ -4,16 +4,13 @@ from util.view import View
 
 #GUI for the recording
 class HomeScreen(View):
-    def __init__(self,name, parent):
-        super().__init__(name, parent)
+    def __init__(self, parent):
+        super().__init__("home", parent)
         self._initWidgets()
-        self.exit_button()
-        exit_button(self)
-        ctk.set_appearance_mode("dark")
 
     def _initWidgets(self):
         # Create grid
-        self.rowconfigure(0,1,2,3, weight=1)
+        self.rowconfigure((0,1,2,3), weight=1)
         self.columnconfigure(0,weight=1)
         # Create widgets
         app_title = ctk.CTkLabel(self, 
@@ -40,35 +37,17 @@ class HomeScreen(View):
         app_title.grid(row = 0, column = 0, rowspan = 2, sticky = 'nsew')
         desc_action.grid(row = 3, column = 0, sticky = 'nsew')
         start_button.grid(row = 3,column = 0)
-    pass
+        super()._init_widgets()
 
-class  exit_button(ctk.CTkButton):
-    def __init__(self,parent):
-        super().__init__(parent,text="X",  
-            font=("Helvetica",20),
-            text_color="white",
-            fg_color="black",
-            corner_radius= 10,
-            text_color="white",
-            fg_color="#f51402",
-            hover_color= '#fc796f'
-            )
-        self.grid(row = 0, column = 0, rowspan = 2, sticky = 'ne')
-    pass
-
-class RecordingScreen(HomeScreen):
+class RecordingScreen(View):
     def __init__(self, parent):
-        super().__init__("recording_sreen", parent)
+        super().__init__("recording_screen", parent)
         self._initWidgets()
-        self.exit_button()
-        exit_button(self)
-        ctk.set_appearance_mode("dark")
-        
 
     def _initWidgets(self):
         # Create grid
         self.columnconfigure(0,weight=1)
-        self.rowconfigure(0,1,2,3, weight=1, uniform='b')
+        self.rowconfigure((0,1,2,3), weight=1, uniform='b')
         # Create widgets
 
         desc_action = ctk.CTkLabel(self,
@@ -88,19 +67,17 @@ class RecordingScreen(HomeScreen):
         # Place widgets
         desc_action.grid(row = 1, column = 0, sticky = 'nsew')
         stop_button.grid(row = 3,column = 0)
-    pass
+        super()._init_widgets()
 
-class StopSreeen(RecordingScreen):
+class StopScreen(View):
     def __init__(self, parent):
-        super().__init__("stop_sreen", parent)
+        super().__init__("stop_screen", parent)
         self._initWidgets()
-        self.exit_button()
-        ctk.set_appearance_mode("dark")
 
     def _initWidgets(self):
         # Create grid
-        self.columnconfigure(0,1,weight=1)
-        self.rowconfigure(0,1,2,3, weight=1, uniform='c')
+        self.columnconfigure((0,1),weight=1)
+        self.rowconfigure((0,1,2,3), weight=1, uniform='c')
         # Create widgets
 
         desc_action = ctk.CTkLabel(self,
@@ -128,20 +105,110 @@ class StopSreeen(RecordingScreen):
         # Place widgets
         desc_action.grid(row = 1, column = 0,columnspan = 2,sticky = 'nsew')
         resume_button.grid(row = 3,column = 0)
-        done_button.grid(row = 3, comlumn = 1)
-        pass
+        done_button.grid(row = 3, column = 1)
+        super()._init_widgets()
 
 #GUI for the speech
 class ScrollFrame(ctk.CTkScrollableFrame):
     def __init__(self, parent):
         super().__init__(parent)
-        self.text = ctk.StringVar(value="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+        self.text = ctk.StringVar(value=
+            """Winston Churchill is widely regarded as one of the most effective leaders of the 20th century, particularly for his leadership during World War Il. However, what made Churchill's leadership style so successful? One way to answer this question is by
+            examining his leadership style through Blake and Mouton's Managerial Leadership Grid. The Managerial Leadership Grid is a tool that assesses a leader's concern for task completion and concern for people, resulting in five leadership styles: impoverished, country club, middle-of-the-road, team, and authority-compliance. Based on his actions and behaviors during World War Il, it is likely that Churchill's leadership style falls under the authority-compliance category of the Grid. This style is characterized by a high
+            concern for task completion and a low concern for people. Despite its limitations, Churchill's authority-compliance leadership style proved highly effective during the war. He was able to rally the British people and coordinate the country's war efforts, ultimately leading to victory over Nazi Germany. However, this style also had its drawbacks, such as the strain it put on Churchill's relationships with his
+            subordinates and the potential for burnout. While Churchill's leadership style may not be suitable for all contexts, it provides valuable insights into the complex interplay between task completion and concern for people in leadership. By using the Managerial Leadership Grid to analyze Churchill's leadership style, we can learn from his successes and limitations and apply these lessons to
+            contemporary leadership development. In conclusion, Winston Churchill's leadership during World War II exemplifies the authority-compliance leadership style as identified by Blake and Mouton's Managerial Leadership Grid. While this style may not be appropriate for all situations, it proved highly effective in rallying a country and leading it to victory. By examining Churchill's leadership style through the Grid, we can gain valuable insights into the role of task completion and concern for people in effective leadership, and apply these lessons to contemporary
+            organizational contexts.""")
         self.label = ctk.CTkLabel(self, 
             textvariable=self.text, 
             justify="left", 
-            wraplength=self.winfo_screenwidth()*0.6,
             font=("Calibri", 34))
         self.label.pack(expand=True, fill="both")
+        
+    def _update_dimensions(self):
+        self.update_idletasks()
+        self.height = self.winfo_height()
+        self.width = self.winfo_width()
+        self.label.configure(wraplength=self.width)
+
+    def pack(self, **kwargs):
+        super().pack(**kwargs)
+        self._update_dimensions()
+        print(self.width, self.height)
+        
+    def place(self, **kwargs):
+        super().place(**kwargs)
+        self._update_dimensions()
+        print(self.width, self.height)
+        
+class ScrollButtons(ctk.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(parent, fg_color="#2A2B2B")
+        self.parent = parent
+        
+        # Create buttons
+        up_button = ctk.CTkButton(self, 
+            text="^",
+            font=("Courier New", 45),
+            fg_color= "black",
+            text_color= "#eb6565",
+            hover_color="#858282",
+            height= 80, 
+            width= 70,
+            corner_radius= 200,
+            command=lambda: self.parent.text_frame._parent_canvas.yview_scroll(-10, "units"))
+        down_button = ctk.CTkButton(self, 
+            text="V",
+            font=("Courier New", 23), 
+            fg_color= "black",
+            text_color= "#eb6565",
+            hover_color="#858282",
+            height= 80, 
+            width= 70,
+            corner_radius= 200, 
+            command=lambda: self.parent.text_frame._parent_canvas.yview_scroll(10, "units"))
+        
+        # Place buttons
+        padx = self.winfo_screenwidth()*0.005
+        up_button.pack(side="left", expand=True, padx=padx)
+        down_button.pack(side="left", expand=True, padx=padx)
+    
+        
+class Prompt(ctk.CTkFrame):
+    def __init__(self, parent, message: str = ""):
+        super().__init__(parent, corner_radius=27, border_color="red", border_width=2)
+        self._parent = parent
+        self.pack_propagate(False)
+        self.place(relx=0.5, rely=0.4, relwidth=0.6, relheight=0.5, anchor="center")
+        self.update_idletasks()
+        self.width = self.winfo_width()
+        self.height = self.winfo_height()
+        self.text_frame = ScrollFrame(self)
+        self.text_frame.text.set(message)
+        self.text_frame.label.configure(fg_color="black", text_color="white")
+        self.text_frame.pack(
+            expand=True, 
+            fill="both",
+            padx=self.width*0.05, 
+            pady=self.height*0.03, 
+        )
+        self.scroll_buttons = ScrollButtons(self)
+        self.scroll_buttons.pack(fill="x")
+        self.confirm = ctk.CTkButton(self, 
+            text="Confirm", 
+            fg_color="black", 
+            border_color="red", 
+            border_width=2, 
+            text_color="white",
+            command=self.hide)
+        self.confirm.pack()
+    
+    def show(self):
+        self.place(relx=0.5, rely=0.4, relwidth=0.6, relheight=0.5, anchor="center")
+        self.tkraise()
+    
+    def hide(self):
+        self.place_forget()
         
 class Results(View):
     def __init__(self, name, parent):
@@ -150,6 +217,7 @@ class Results(View):
         self.screenheight = self.winfo_screenheight()
         tabs = self.get_tabs()
         tabs.pack(side="bottom", fill="x",ipady=self.screenheight*0.02)
+        super()._init_widgets()
         
     def get_tabs(self):
         frame = ctk.CTkFrame(self,bg_color="black")
@@ -185,7 +253,6 @@ class Results(View):
         editing_button.pack(side="left", expand=True, fill="both", padx=100)
         
         return frame
-
         
 class Editing(Results):
     def __init__(self, parent):
@@ -193,7 +260,7 @@ class Editing(Results):
         
         # Create widgets
         self.text_frame = ScrollFrame(self)
-        scroll_buttons = self.get_scroll_buttons()
+        scroll_buttons = ScrollButtons(self)
         editing_options = self.get_editing_options()
         
         # Place widgets
@@ -204,38 +271,7 @@ class Editing(Results):
             ipady=self.screenheight*0.13)
         scroll_buttons.pack(fill="x", padx=self.screenwidth*0.25, ipady=self.screenheight*0.02)
         editing_options.pack(fill="both", expand=True, padx=self.screenwidth*0.25, pady=self.screenheight*0.03)
-        
-    def get_scroll_buttons(self):
-        frame = ctk.CTkFrame(self, fg_color="#2A2B2B")
-        
-        # Create buttons
-        up_button = ctk.CTkButton(frame, 
-            text="^",
-            font=("Courier New", 45),
-            fg_color= "black",
-            text_color= "#eb6565",
-            hover_color="#858282",
-            height= 80, 
-            width= 70,
-            corner_radius= 200,
-            command=lambda: self.text_frame._parent_canvas.yview_scroll(10, "units"))
-        down_button = ctk.CTkButton(frame, 
-            text="V",
-            font=("Courier New", 23), 
-            fg_color= "black",
-            text_color= "#eb6565",
-            hover_color="#858282",
-            height= 80, 
-            width= 70,
-            corner_radius= 200, 
-            command=lambda: self.text_frame._parent_canvas.yview_scroll(-10, "units"))
-        
-        # Place buttons
-        padx = self.screenwidth*0.005
-        up_button.pack(side="left", expand=True, padx=padx)
-        down_button.pack(side="left", expand=True, padx=padx)
-        
-        return frame
+        super()._init_widgets()
     
     def get_editing_options(self):
         frame = ctk.CTkFrame(self, fg_color="#000000")
@@ -272,13 +308,13 @@ class Editing(Results):
                                        fg_color= "black",
                                        text_color= "white",
                                        hover_color="#858282",
-                                       command=lambda: self._parent.enhance(enhance_option.get()))
+                                       command=lambda: self._parent.enhance(enhance_option.get(), self.text_frame.text))
         suggest_button = ctk.CTkButton(frame, text="Suggest",
                                        font=("Courier New", 35),
                                        fg_color= "black",
                                        text_color= "white",
                                        hover_color="#858282",
-                                       command=lambda: self._parent.suggest(suggest_option.get()))
+                                       command=lambda: self._parent.suggest(suggest_option.get(), self.text_frame.text))
         
         # Place widgets
         enhancement_options.grid(row=0, column=0, sticky="ew", padx=self.screenwidth*0.005)
