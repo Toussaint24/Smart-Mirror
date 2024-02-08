@@ -8,6 +8,8 @@ class View(ctk.CTkFrame):
         super().__init__(parent)
         self._parent = parent
         self._parent.view_list[name] = self
+        #self.canvas = ctk.CTkCanvas(self,background = "black")
+        #self.canvas.pack(expand=True, fill='both')
         self.place(relwidth=1.0, relheight=1.0)
         self.pack_propagate(False)
         
