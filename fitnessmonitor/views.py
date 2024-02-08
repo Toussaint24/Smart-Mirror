@@ -60,7 +60,7 @@ class Settings(View):
         self.rowconfigure((0, 1, 2, 3, 4, 5), weight=1)
         self.columnconfigure(0, weight=1)
 
-        ctk.CTkLabel(self, text= 'SETTING', font=("Helvetica", 115),bg_color="black", anchor="center").grid(row=0, column=0, sticky=tk.NSEW)
+        ctk.CTkLabel(self, text= 'S E T T I N G', font=("Helvetica", 115),bg_color="black", anchor="center").grid(row=0, column=0, sticky=tk.NSEW)
         ctk.CTkButton(self, text="Coming soon...", command=None,
                       fg_color= '#000',
                       text_color='#ffffff',
@@ -125,7 +125,7 @@ class ExerciseList(View):
         self.columnconfigure(0, weight=1)
 
         # Create widgets
-        ctk.CTkLabel(self, text= 'EXERCISE', font=("Helvetica", 115),bg_color="black", anchor="center").grid(row=0, column=0, sticky=tk.NSEW)
+        ctk.CTkLabel(self, text= 'E X E R C I S E', font=("Helvetica", 115),bg_color="black", anchor="center").grid(row=0, column=0, sticky=tk.NSEW)
         ctk.CTkButton(self, text="Bicep Curl", command=self._parent.record,
                       fg_color= '#000',
                       text_color='#ffffff',
