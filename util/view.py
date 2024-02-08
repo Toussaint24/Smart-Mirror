@@ -10,3 +10,14 @@ class View(ctk.CTkFrame):
         self._parent.view_list[name] = self
         self.place(relwidth=1.0, relheight=1.0)
         self.pack_propagate(False)
+        
+    def _init_widgets(self):
+        self.button = ctk.CTkButton(self, 
+            text="X", 
+            font=("Helvetica",20),
+            corner_radius=10,
+            fg_color="#f51402", 
+            hover_color="#fc796f", 
+            text_color="white", 
+            command=self._parent.quit)
+        self.button.place(relx=1.0, rely=0.0, anchor="ne", relwidth=0.075, relheight=0.05)
