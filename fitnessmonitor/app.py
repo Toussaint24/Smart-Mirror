@@ -22,8 +22,7 @@ class App(ctk.CTk):
         ctk.set_appearance_mode("dark")
         super().__init__(fg_color="black")
         self.attributes("-fullscreen", True)
-        self.overrideredirect(True)
-        self.resizable(False, False)
+        self.attributes("-type", "splash")
         
         self._recorder = PoseRecorder(
                 output_size=(self.winfo_screenwidth(), self.winfo_screenheight())
