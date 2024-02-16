@@ -13,7 +13,6 @@ class View(ctk.CTkFrame):
         #self.frame = ctk.CTkFrame(self,fg_color="black")
         self.place(relwidth=1.0, relheight=1.0)
         self.pack_propagate(False)
-<<<<<<< HEAD
 
         
     def _init_widgets(self):
@@ -26,9 +25,3 @@ class View(ctk.CTkFrame):
             text_color="white", 
             command=self._parent.quit)
         self.button.place(relx=1.0, rely=0.0, anchor="ne", relwidth=0.060, relheight=0.05)
-=======
-        
-    def _init_widgets(self):
-        self.button = ctk.CTkButton(self, text="X", fg_color="red", text_color="white", command=self._parent.quit)
-        self.button.place(relx=1.0, rely=0.0, anchor="ne", relwidth=0.075, relheight=0.05)
->>>>>>> fitness-monitor
